@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  spark-master:
+    image: spark:3.5.3
+    container_name: spark-master
+    command: ["/opt/spark/bin/spark-class","org.apache.spark.deploy.master.Master","--host","spark-master","--port","7077","--webui-port","8080"]
+    ports:
+      - "8080:8080"   # Spark Master UI
+      - "7077:7077"   # Standalone master
+    networks: [tinitiate]
+
+  spark-worker:
+    image: spark:3.5.3
+    container_name: spark-worker
+    depends_on: [spark-master]
+    command: ["/opt/spark/bin/spark-class","org.apache.spark.deploy.worker.Worker","spark://spark-master:7077","--webui-port","8081"]
+    environment:
+      - SPARK_WORKER_CORES=2
+      - SPARK_WORKER_MEMORY=2G
+    ports:
+      - "8081:8081"   # Worker UI
+    networks: [tinitiate]
+
+  jupyter:
+    image: quay.io/jupyter/pyspark-notebook:spark-3.5.3
+    container_name: jupyter
+    ports:
+      - "8888:8888"
+    volumes:
+      - "E:/dataengineering/data:/home/jovyan/work"
+    networks: [tinitiate]
+
+networks:
+  tinitiate:
+    driver: bridge
