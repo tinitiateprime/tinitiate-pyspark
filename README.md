@@ -1,7 +1,7 @@
 ![PySpark Tinitiate Image](tinitiate-pyspark.png)
 
 # PySpark Training
-> Venkata Bhattaram &copy; TINITIATE.COM
+> Venkata Bhattaram , Jay Kumsi &copy; TINITIATE.COM
 
 This repository contains hands-on PySpark notebooks for SQL-style data
 processing, joins, set operations, operators, functions, analytics, and
