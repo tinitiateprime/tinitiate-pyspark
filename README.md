@@ -9,14 +9,29 @@ performance tuning.
 
 ## Index
 
-| Section | Notes and Descriptions |
-|---|---|
-| DQL clauses | [dql_clauses/README.md](dql_clauses/README.md) |
-| Joins | [joins/README.md](joins/README.md) |
-| Set operations | [set_operations/README.md](set_operations/README.md) |
-| Operators | [operators/README.md](operators/README.md) |
-| String functions | [string_functions/README.md](string_functions/README.md) |
-| Aggregate functions | [aggregate_functions/README.md](aggregate_functions/README.md) |
-| Analytical functions | [analytical_functions/README.md](analytical_functions/README.md) |
-| Performance tuning | [performance_tuning.md](performance_tuning.md) |
-| Supporting files | [misc/README.md](misc/README.md) |
+### [DQL Clauses](dql_clauses/README.md)
+Learn the core SQL query flow in PySpark, from choosing columns and filtering rows to building grouped summaries and sorting final results.
+
+### [Joins](joins/README.md)
+Connect related datasets with inner joins, outer joins, multi-table joins, and range-based join conditions.
+
+### [Set Operations](set_operations/README.md)
+Combine and compare compatible result sets using union, intersection, and difference patterns.
+
+### [Operators](operators/README.md)
+Build clear filter logic with comparisons, value lists, text patterns, ranges, and existence checks.
+
+### [String Functions](string_functions/README.md)
+Clean, standardize, search, and reshape text values for reliable filtering, joining, and reporting.
+
+### [Aggregate Functions](aggregate_functions/README.md)
+Summarize data with counts, totals, averages, minimums, maximums, and grouped business metrics.
+
+### [Analytical Functions](analytical_functions/README.md)
+Use window functions to rank rows, create buckets, compare neighboring records, and keep row-level detail.
+
+### [Performance Tuning](performance_tuning.md)
+Explore how file layout, join strategy, compaction, and Spark execution choices affect performance.
+
+### [Supporting Files](misc/README.md)
+Find setup references, supporting Python notes, tutorial outlines, generated data, and helper scripts.
