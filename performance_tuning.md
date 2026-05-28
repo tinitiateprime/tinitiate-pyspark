@@ -12,6 +12,297 @@ The companion notebook is:
 
 Use the notebook to run the benchmarks and view the charts. Use this markdown as the explanation and discussion guide.
 
+## Teaching Runbook: Small Files to Larger Files
+
+This section gives the complete classroom flow. The story is:
+
+1. A source system sends many small files.
+2. Spark loads the raw small files.
+3. Loading is slower because Spark must list, plan, and scan many files.
+4. We merge the small files into fewer larger files.
+5. Spark processes the compacted files.
+6. We compare runtimes before and after compaction.
+
+Use Parquet first when teaching because the folder layout is simple and the performance lesson is clear. After students understand the idea, repeat the same pattern for CSV and JSON.
+
+### Scripts Used
+
+| Script | Purpose |
+|---|---|
+| `scripts/generate_training_csv.py` | Generates CSV training files. |
+| `scripts/generate_training_json.py` | Generates JSON training files. |
+| `scripts/generate_training_parquet.py` | Generates Parquet training files. |
+| `scripts/generate_emp_update_files.py` | Generates small and large employee update files. |
+| `scripts/compact_small_files.py` | Reads many small files and writes fewer larger files. |
+| `scripts/create_join_performance_notebook.py` | Rebuilds the benchmark notebook if needed. |
+
+### Step 1: Generate Small Source Files
+
+This simulates a source system sending many tiny files. The example below creates Parquet files with 10 rows per file.
+
+```powershell
+python scripts/generate_training_parquet.py `
+  --output-dir data/generated_parquet_10 `
+  --overwrite `
+  --rows-per-file 10 `
+  --skip-emp-projects
+```
+
+Teaching point:
+
+* The data volume can be normal, but the file count becomes very high.
+* Spark must do work for each file, even when each file is tiny.
+
+### Step 2: Generate Larger Files
+
+This creates the same type of data with fewer, larger files.
+
+```powershell
+python scripts/generate_training_parquet.py `
+  --output-dir data/generated_parquet_10000 `
+  --overwrite `
+  --rows-per-file 10000 `
+  --skip-emp-projects
+```
+
+Teaching point:
+
+* The logical data is similar.
+* The file layout is different.
+* Fewer files usually means less metadata and scheduling overhead.
+
+### Step 3: Generate CSV and JSON Versions
+
+Use these commands when you want to compare file formats also.
+
+```powershell
+python scripts/generate_training_json.py `
+  --output-dir data/generated_json_10 `
+  --overwrite `
+  --rows-per-file 10 `
+  --skip-emp-projects
+
+python scripts/generate_training_json.py `
+  --output-dir data/generated_json_10000 `
+  --overwrite `
+  --rows-per-file 10000 `
+  --skip-emp-projects
+```
+
+```powershell
+python scripts/generate_training_csv.py `
+  --output-dir data/generated_csv_10 `
+  --overwrite `
+  --dept-rows-per-file 10 `
+  --emp-rows-per-file 10 `
+  --project-rows-per-file 10 `
+  --salgrade-rows-per-file 10 `
+  --skip-emp-projects
+
+python scripts/generate_training_csv.py `
+  --output-dir data/generated_csv_10000 `
+  --overwrite `
+  --dept-rows-per-file 10000 `
+  --emp-rows-per-file 10000 `
+  --project-rows-per-file 10000 `
+  --salgrade-rows-per-file 10000 `
+  --skip-emp-projects
+```
+
+Teaching point:
+
+* Compare CSV with CSV, JSON with JSON, and Parquet with Parquet.
+* Do not mix file-format performance with file-layout performance too early.
+
+### Step 4: Count Files Before Loading
+
+Use PowerShell to show students the physical file count.
+
+```powershell
+(Get-ChildItem data/generated_parquet_10/emp -Filter *.parquet).Count
+(Get-ChildItem data/generated_parquet_10000/emp -Filter *.parquet).Count
+```
+
+Expected discussion:
+
+* `data/generated_parquet_10/emp` should have many more files.
+* `data/generated_parquet_10000/emp` should have far fewer files.
+* Both folders represent the same table concept, but Spark sees very different input layouts.
+
+### Step 5: Load Small Files in PySpark
+
+Run this in a notebook cell or PySpark shell:
+
+```python
+import time
+from pyspark.sql import SparkSession
+
+spark = (
+    SparkSession.builder
+    .appName("small-files-demo")
+    .config("spark.sql.adaptive.enabled", "true")
+    .getOrCreate()
+)
+
+start = time.perf_counter()
+small_emp = spark.read.parquet("data/generated_parquet_10/emp")
+small_count = small_emp.count()
+small_seconds = time.perf_counter() - start
+
+print(f"Small-file count: {small_count:,}")
+print(f"Small-file load seconds: {small_seconds:,.2f}")
+```
+
+Teaching point:
+
+* `count()` is the action that forces Spark to actually read the data.
+* The DataFrame line is lazy; the timed work happens when `count()` runs.
+
+### Step 6: Load Larger Files in PySpark
+
+Run the same logic against the larger-file folder:
+
+```python
+start = time.perf_counter()
+large_emp = spark.read.parquet("data/generated_parquet_10000/emp")
+large_count = large_emp.count()
+large_seconds = time.perf_counter() - start
+
+print(f"Larger-file count: {large_count:,}")
+print(f"Larger-file load seconds: {large_seconds:,.2f}")
+```
+
+Teaching point:
+
+* The row counts should match.
+* If the larger-file load is faster, the improvement is from layout, not different data.
+
+### Step 7: Merge Small Files with the Script
+
+Use the compaction script to merge small source files into fewer larger files.
+
+```powershell
+spark-submit scripts/compact_small_files.py `
+  --format parquet `
+  --input-path data/generated_parquet_10/emp `
+  --output-path data/compacted/parquet_emp `
+  --partitions 100
+```
+
+Teaching point:
+
+* `repartition(100)` targets about 100 output files.
+* The best partition count depends on data size and cluster size.
+* The goal is not one giant file. The goal is fewer, healthier files.
+
+### Step 8: Load the Compacted Files
+
+Now read the compacted output:
+
+```python
+start = time.perf_counter()
+compacted_emp = spark.read.parquet("data/compacted/parquet_emp")
+compacted_count = compacted_emp.count()
+compacted_seconds = time.perf_counter() - start
+
+print(f"Compacted count: {compacted_count:,}")
+print(f"Compacted load seconds: {compacted_seconds:,.2f}")
+```
+
+Teaching point:
+
+* The compacted row count should match the small-file row count.
+* The compacted load should usually be faster than repeatedly loading raw tiny files.
+
+### Step 9: Compare Before and After
+
+Use a small table to summarize the result:
+
+```python
+results = [
+    ("small files", small_count, round(small_seconds, 2)),
+    ("larger files", large_count, round(large_seconds, 2)),
+    ("compacted files", compacted_count, round(compacted_seconds, 2)),
+]
+
+spark.createDataFrame(results, ["layout", "rows", "seconds"]).show(truncate=False)
+```
+
+Teaching point:
+
+* File layout changes runtime even when row count is the same.
+* Compaction is a common first step after receiving many small source files.
+
+### Step 10: Run a Join After Compaction
+
+Use the same join before and after compaction:
+
+```python
+from pyspark.sql import functions as F
+
+dept = spark.read.parquet("data/generated_parquet_10000/dept")
+
+start = time.perf_counter()
+small_join_rows = small_emp.join(F.broadcast(dept), "deptno", "inner").count()
+small_join_seconds = time.perf_counter() - start
+
+start = time.perf_counter()
+compacted_join_rows = compacted_emp.join(F.broadcast(dept), "deptno", "inner").count()
+compacted_join_seconds = time.perf_counter() - start
+
+print(f"Small-file join rows: {small_join_rows:,}, seconds: {small_join_seconds:,.2f}")
+print(f"Compacted join rows: {compacted_join_rows:,}, seconds: {compacted_join_seconds:,.2f}")
+```
+
+Teaching point:
+
+* Compaction helps downstream processing, not only raw loading.
+* Broadcast joins are useful when the lookup table is small enough to fit in memory.
+
+### Step 11: Run the Full Notebook
+
+Open and run:
+
+```text
+02_join_performance_small_vs_large_files.ipynb
+```
+
+The notebook includes:
+
+* folder and file statistics
+* CSV, JSON, and Parquet layout comparisons
+* `emp` join `dept`
+* small update vs large update benchmarks
+* optional large bridge-table join
+* explain-plan discussion
+
+### Step 12: Generate Update Files
+
+Use this when teaching why small updates can still be expensive with plain files.
+
+```powershell
+python scripts/generate_emp_update_files.py `
+  --output-dir data/update_records `
+  --overwrite `
+  --small-records 100 `
+  --large-records 100000
+```
+
+Teaching point:
+
+* Plain CSV, JSON, and Parquet files do not provide true row-level updates.
+* A small update may still require reading and rewriting the full base dataset.
+
+### Step 13: Optional Notebook Rebuild
+
+If the generated notebook needs to be rebuilt from the script:
+
+```powershell
+python scripts/create_join_performance_notebook.py
+```
+
+Use this only when changing the notebook generator script.
+
 ## Core Idea
 
 Spark can process large data in parallel, but every input file still has overhead.
