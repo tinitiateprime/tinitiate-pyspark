@@ -1,4 +1,4 @@
-![Pyspark Tinitiate Image](tinitiate-pyspark.png)
+![PySpark TINITIATE](../../tinitiate-pyspark.png)
 # PySpark Training
 > Venkata Bhattaram &copy; TINITIATE.COM
 

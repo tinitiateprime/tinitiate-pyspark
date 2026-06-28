@@ -27,4 +27,4 @@ Window functions are powerful, but they depend on clear partitioning and orderin
 
 Use `partitionBy` when calculations should restart for each group. Use `orderBy` when row sequence matters.
 
-[Back to main index](../README.md)
+[Back to main README](../../README.md#curriculum)

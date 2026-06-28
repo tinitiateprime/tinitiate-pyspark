@@ -30,4 +30,4 @@ String cleanup is often best done before joins and grouping. Small differences s
 
 When replacing or extracting text, create clear output column names so the transformed value is easy to inspect.
 
-[Back to main index](../README.md)
+[Back to main README](../../README.md#curriculum)

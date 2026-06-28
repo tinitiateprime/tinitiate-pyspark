@@ -29,4 +29,4 @@ Always think about nulls when writing conditions. A comparison with null often d
 
 For DataFrame code, wrap columns with `F.col(...)` when expressions become more complex. It keeps the logic explicit and easier to maintain.
 
-[Back to main index](../README.md)
+[Back to main README](../../README.md#curriculum)

@@ -26,4 +26,4 @@ Use aliases for aggregate columns. Names like `avg_salary` or `employee_count` m
 
 For production logic, think carefully about nulls and data quality before interpreting aggregate results.
 
-[Back to main index](../README.md)
+[Back to main README](../../README.md#curriculum)

@@ -7,10 +7,12 @@ This guide explains how Spark performance changes when the same data is stored i
 The companion notebook is:
 
 ```text
-02_join_performance_small_vs_large_files.ipynb
+pyspark-notebooks/02_join_performance_small_vs_large_files.ipynb
 ```
 
 Use the notebook to run the benchmarks and view the charts. Use this markdown as the explanation and discussion guide.
+
+For large CSV extraction, 10,000-file stress tests, ZIP archives, malformed CSV, corrupt Parquet, and update ingestion, use the companion [file I/O and data quality lab](performance_io.md).
 
 ## Teaching Runbook: Small Files to Larger Files
 
@@ -29,19 +31,20 @@ Use Parquet first when teaching because the folder layout is simple and the perf
 
 | Script | Purpose |
 |---|---|
-| `scripts/generate_training_csv.py` | Generates CSV training files. |
-| `scripts/generate_training_json.py` | Generates JSON training files. |
-| `scripts/generate_training_parquet.py` | Generates Parquet training files. |
-| `scripts/generate_emp_update_files.py` | Generates small and large employee update files. |
-| `scripts/compact_small_files.py` | Reads many small files and writes fewer larger files. |
-| `scripts/create_join_performance_notebook.py` | Rebuilds the benchmark notebook if needed. |
+| `pyspark-basics/scripts/generate_io_performance_fixtures.py` | Generates large, tiny, zipped, malformed, and corrupt-file fixtures. |
+| `pyspark-basics/scripts/generate_training_csv.py` | Generates CSV training files. |
+| `pyspark-basics/scripts/generate_training_json.py` | Generates JSON training files. |
+| `pyspark-basics/scripts/generate_training_parquet.py` | Generates Parquet training files. |
+| `pyspark-basics/scripts/generate_emp_update_files.py` | Generates small and large employee update files. |
+| `pyspark-basics/scripts/compact_small_files.py` | Reads many small files and writes fewer larger files. |
+| `pyspark-basics/scripts/create_join_performance_notebook.py` | Rebuilds the benchmark notebook if needed. |
 
 ### Step 1: Generate Small Source Files
 
 This simulates a source system sending many tiny files. The example below creates Parquet files with 10 rows per file.
 
 ```powershell
-python scripts/generate_training_parquet.py `
+python pyspark-basics/scripts/generate_training_parquet.py `
   --output-dir data/generated_parquet_10 `
   --overwrite `
   --rows-per-file 10 `
@@ -58,7 +61,7 @@ Teaching point:
 This creates the same type of data with fewer, larger files.
 
 ```powershell
-python scripts/generate_training_parquet.py `
+python pyspark-basics/scripts/generate_training_parquet.py `
   --output-dir data/generated_parquet_10000 `
   --overwrite `
   --rows-per-file 10000 `
@@ -76,13 +79,13 @@ Teaching point:
 Use these commands when you want to compare file formats also.
 
 ```powershell
-python scripts/generate_training_json.py `
+python pyspark-basics/scripts/generate_training_json.py `
   --output-dir data/generated_json_10 `
   --overwrite `
   --rows-per-file 10 `
   --skip-emp-projects
 
-python scripts/generate_training_json.py `
+python pyspark-basics/scripts/generate_training_json.py `
   --output-dir data/generated_json_10000 `
   --overwrite `
   --rows-per-file 10000 `
@@ -90,7 +93,7 @@ python scripts/generate_training_json.py `
 ```
 
 ```powershell
-python scripts/generate_training_csv.py `
+python pyspark-basics/scripts/generate_training_csv.py `
   --output-dir data/generated_csv_10 `
   --overwrite `
   --dept-rows-per-file 10 `
@@ -99,7 +102,7 @@ python scripts/generate_training_csv.py `
   --salgrade-rows-per-file 10 `
   --skip-emp-projects
 
-python scripts/generate_training_csv.py `
+python pyspark-basics/scripts/generate_training_csv.py `
   --output-dir data/generated_csv_10000 `
   --overwrite `
   --dept-rows-per-file 10000 `
@@ -182,7 +185,7 @@ Teaching point:
 Use the compaction script to merge small source files into fewer larger files.
 
 ```powershell
-spark-submit scripts/compact_small_files.py `
+spark-submit pyspark-basics/scripts/compact_small_files.py `
   --format parquet `
   --input-path data/generated_parquet_10/emp `
   --output-path data/compacted/parquet_emp `
@@ -264,7 +267,7 @@ Teaching point:
 Open and run:
 
 ```text
-02_join_performance_small_vs_large_files.ipynb
+pyspark-notebooks/02_join_performance_small_vs_large_files.ipynb
 ```
 
 The notebook includes:
@@ -281,7 +284,7 @@ The notebook includes:
 Use this when teaching why small updates can still be expensive with plain files.
 
 ```powershell
-python scripts/generate_emp_update_files.py `
+python pyspark-basics/scripts/generate_emp_update_files.py `
   --output-dir data/update_records `
   --overwrite `
   --small-records 100 `
@@ -298,7 +301,7 @@ Teaching point:
 If the generated notebook needs to be rebuilt from the script:
 
 ```powershell
-python scripts/create_join_performance_notebook.py
+python pyspark-basics/scripts/create_join_performance_notebook.py
 ```
 
 Use this only when changing the notebook generator script.

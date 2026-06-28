@@ -55,4 +55,4 @@ Each notebook shows two styles:
 
 Both styles run through Spark's optimizer. In most lessons, focus first on understanding the query meaning, then compare how the same logic appears in each syntax.
 
-[Back to main index](../README.md)
+[Back to main README](../../README.md#curriculum)

@@ -1,215 +1,236 @@
-![PySpark Tinitiate Image](tinitiate-pyspark.png)
+<p align="center">
+  <img src="tinitiate-pyspark.png" alt="TINITIATE PySpark Training" width="100%">
+</p>
 
-# PySpark Training
-> Venkata Bhattaram & Jay Kumsi &copy; TINITIATE.COM
+<h1 align="center">PySpark Training</h1>
 
-- **PySpark Core Language**
+<p align="center">
+  A practical, notebook-based path from Spark fundamentals to performance tuning and data lake operations.
+</p>
 
-  - ## [DQL Clauses](dql_clauses/README.md)
+<p align="center">
+  <a href="#quick-start">Quick start</a> •
+  <a href="#curriculum">Curriculum</a> •
+  <a href="#performance-tuning">Performance</a> •
+  <a href="#data-lake-operations">Data lake</a>
+</p>
 
-    - [SELECT](dql_clauses/01_select.ipynb)
-      - Choose output columns
-      - Reorder columns
-      - Return only needed fields
+---
 
-    - [WHERE](dql_clauses/02_where.ipynb)
-      - Row-level filtering
-      - Salary cutoffs and comparisons
-      - Boolean expressions
+## What is PySpark?
 
-    - [GROUP BY](dql_clauses/03_group_by.ipynb)
-      - Group records
-      - Calculate counts, averages, and totals
+PySpark is the Python API for [Apache Spark](https://spark.apache.org/), an open-source engine for processing large datasets across one machine or a distributed cluster. It combines Python's approachable syntax with Spark's scalable execution engine, allowing the same code to grow from local exploration to production data pipelines.
 
-    - [HAVING](dql_clauses/04_having.ipynb)
-      - Filter aggregate results
-      - Keep grouped summaries that match conditions
+PySpark provides DataFrames and Spark SQL for transforming structured data, along with tools for streaming, machine learning, and large-scale analytics. Its lazy execution model builds an optimized plan before running a job, helping teams process data efficiently without managing low-level distributed computing details.
 
-    - [ORDER BY](dql_clauses/05_order_by.ipynb)
-      - Sort query results
-      - Use ascending, descending, and multi-column sorting
+## About this repository
 
-  - ## [Joins](joins/README.md)
+This course teaches PySpark through focused Jupyter notebooks and hands-on examples. Start with DataFrame and Spark SQL fundamentals, progress through joins and window functions, then apply those skills to performance tuning and a MinIO-backed data lake.
 
-    - [Inner join](joins/01_inner_join.ipynb)
-      - Keep only rows that match on both sides
+### What you will learn
 
-    - [Left outer join](joins/02_left_outer_join.ipynb)
-      - Keep every row from the left side
-      - Fill unmatched right-side columns with null
+- Query, filter, group, and sort distributed data with PySpark
+- Combine datasets with joins and set operations
+- Clean and transform text with built-in Spark functions
+- Build summaries with aggregate and analytical functions
+- Diagnose small-file, shuffle, partitioning, and join-performance issues
+- Load, compact, and validate retail-banking data in MinIO
 
-    - [Right outer join](joins/03_right_outer_join.ipynb)
-      - Keep every row from the right side
-      - Compare with left join table order
+## Quick start
 
-    - [Full outer join](joins/04_full_outer_join.ipynb)
-      - Keep matched and unmatched rows from both tables
-      - Use for reconciliation checks
+### Prerequisites
 
-    - [Multiple table joins](joins/05_multiple_tables.ipynb)
-      - Connect several related tables
-      - Join employees, bridge tables, and projects
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- Git
+- A web browser for JupyterLab
 
-    - [Non-equi joins](joins/06_non_equi_join.ipynb)
-      - Join with range or comparison logic
-      - Match salary values to salary grades
+### Run the training environment
 
-  - ## [Set Operations](set_operations/README.md)
+```bash
+git clone https://github.com/tinitiateprime/tinitiate-pyspark.git
+cd tinitiate-pyspark/pyspark-basics/misc
+docker compose -f pyspark-docker-setup.yml up -d
+```
 
-    - [UNION](set_operations/01_union.ipynb)
-      - Combine two result sets
-      - Remove duplicate rows
+Open JupyterLab at [http://localhost:8888](http://localhost:8888). If it requests a token, retrieve the URL from the container logs:
 
-    - [UNION ALL](set_operations/02_union_all.ipynb)
-      - Combine two result sets
-      - Keep duplicate rows
+```bash
+docker logs jupyter
+```
 
-    - [INTERSECT](set_operations/03_intersect.ipynb)
-      - Return only rows that appear in both result sets
+> [!NOTE]
+> Before starting the containers, update the host path in the Jupyter volume mapping inside [`pyspark-docker-setup.yml`](pyspark-basics/misc/pyspark-docker-setup.yml) for your machine.
 
-    - [EXCEPT](set_operations/04_except.ipynb)
-      - Return rows from the first result set that do not appear in the second
+For more detail, see the [local PySpark setup guide](pyspark-basics/misc/pyspark-local-setup.md).
 
-  - ## [Operators](operators/README.md)
+## Performance-first learning path
 
-    - [Equality and inequality](operators/01_equality_inequality.ipynb)
-      - Compare equal and not-equal values
+If performance engineering is your main goal, use this sequence:
 
-    - [IN and NOT IN](operators/02_in_not_in.ipynb)
-      - Keep or exclude rows based on a list of values
+1. Work through the [file I/O and data quality lab](performance_io.md) for large CSVs, tiny-file stress tests, ZIP extraction, error quarantine, and CSV/Parquet updates.
+2. Run the [small-vs-large-file notebook](pyspark-notebooks/02_join_performance_small_vs_large_files.ipynb) and compare file listing, scan planning, task count, and runtime.
+3. Use the [performance tuning guide](performance_tuning.md) for joins, shuffles, broadcast strategy, skew, partitioning, caching, and compaction.
+4. Apply the patterns to the [MinIO data lake pipeline](pyspark-datalake/docs/batch-loads-minio.md) and validate both performance and row/file reconciliation.
 
-    - [LIKE and NOT LIKE](operators/03_like_not_like.ipynb)
-      - Filter text using wildcard pattern matching
+## Curriculum
 
-    - [BETWEEN](operators/04_between.ipynb)
-      - Filter values inside an inclusive range
+### 1. DQL clauses
 
-    - [Comparisons](operators/05_comparisons.ipynb)
-      - Use greater-than, less-than, and related comparisons
+Learn the building blocks of DataFrame queries and their Spark SQL equivalents.
 
-    - [EXISTS and NOT EXISTS](operators/06_exists_not_exists.ipynb)
-      - Check for related rows
-      - Use Spark SQL subqueries, semi joins, and anti joins
+| Lesson | Topics |
+| --- | --- |
+| [SELECT](pyspark-basics/dql_clauses/01_select.ipynb) | Choose, reorder, and alias output columns |
+| [WHERE](pyspark-basics/dql_clauses/02_where.ipynb) | Filter rows with comparisons and Boolean expressions |
+| [GROUP BY](pyspark-basics/dql_clauses/03_group_by.ipynb) | Group records and calculate summaries |
+| [HAVING](pyspark-basics/dql_clauses/04_having.ipynb) | Filter aggregate results |
+| [ORDER BY](pyspark-basics/dql_clauses/05_order_by.ipynb) | Sort by one or more columns |
 
-  - ## [String Functions](string_functions/README.md)
+[Read the DQL overview →](pyspark-basics/dql_clauses/README.md)
 
-    - [Substring and concatenation](string_functions/01_substring_concatenation.ipynb)
-      - Extract part of a string
-      - Combine values into readable labels
+### 2. Joins
 
-    - [LOWER and UPPER](string_functions/02_lower_upper.ipynb)
-      - Convert text to lower or upper case
-      - Standardize values for display and comparison
+Combine related datasets and learn how each join type handles matched and unmatched rows.
 
-    - [TRIM, LTRIM, and RTRIM](string_functions/03_trim_ltrim_rtrim.ipynb)
-      - Remove unwanted spaces
-      - Clean text before joins and filters
+| Lesson | Topics |
+| --- | --- |
+| [Inner join](pyspark-basics/joins/01_inner_join.ipynb) | Keep rows that match on both sides |
+| [Left outer join](pyspark-basics/joins/02_left_outer_join.ipynb) | Keep all rows from the left dataset |
+| [Right outer join](pyspark-basics/joins/03_right_outer_join.ipynb) | Keep all rows from the right dataset |
+| [Full outer join](pyspark-basics/joins/04_full_outer_join.ipynb) | Keep matched and unmatched rows from both sides |
+| [Multiple-table joins](pyspark-basics/joins/05_multiple_tables.ipynb) | Connect several related datasets |
+| [Non-equi joins](pyspark-basics/joins/06_non_equi_join.ipynb) | Join with ranges and comparison conditions |
 
-    - [CHARINDEX](string_functions/04_charindex.ipynb)
-      - Find the position of one string inside another
+[Read the joins overview →](pyspark-basics/joins/README.md)
 
-    - [LEFT and RIGHT](string_functions/05_left_right.ipynb)
-      - Extract characters from the beginning or end of text
+### 3. Set operations
 
-    - [REVERSE, REPLACE, and LENGTH](string_functions/06_reverse_replace_length.ipynb)
-      - Reverse strings
-      - Replace text
-      - Measure text length
+Combine or compare compatible datasets while controlling duplicate rows.
 
-  - ## [Aggregate Functions](aggregate_functions/README.md)
+| Lesson | Topics |
+| --- | --- |
+| [UNION](pyspark-basics/set_operations/01_union.ipynb) | Combine datasets and remove duplicates |
+| [UNION ALL](pyspark-basics/set_operations/02_union_all.ipynb) | Combine datasets and retain duplicates |
+| [INTERSECT](pyspark-basics/set_operations/03_intersect.ipynb) | Return rows found in both datasets |
+| [EXCEPT](pyspark-basics/set_operations/04_except.ipynb) | Return rows found only in the first dataset |
 
-    - [COUNT](aggregate_functions/01_count.ipynb)
-      - Count all rows
-      - Count non-null values in a column
+[Read the set operations overview →](pyspark-basics/set_operations/README.md)
 
-    - [SUM and AVG](aggregate_functions/02_sum_avg.ipynb)
-      - Calculate totals
-      - Calculate averages for numeric columns
+### 4. Operators
 
-    - [MAX and MIN](aggregate_functions/03_max_min.ipynb)
-      - Find highest and lowest values
+Build expressive filters with comparisons, ranges, patterns, lists, and existence checks.
 
-    - [Aggregate by group](aggregate_functions/04_by_group.ipynb)
-      - Apply aggregate functions by category
-      - Build salary totals and counts by department
+| Lesson | Topics |
+| --- | --- |
+| [Equality and inequality](pyspark-basics/operators/01_equality_inequality.ipynb) | Equal and not-equal comparisons |
+| [IN and NOT IN](pyspark-basics/operators/02_in_not_in.ipynb) | Include or exclude a list of values |
+| [LIKE and NOT LIKE](pyspark-basics/operators/03_like_not_like.ipynb) | Match text patterns with wildcards |
+| [BETWEEN](pyspark-basics/operators/04_between.ipynb) | Filter values within an inclusive range |
+| [Comparisons](pyspark-basics/operators/05_comparisons.ipynb) | Greater-than and less-than comparisons |
+| [EXISTS and NOT EXISTS](pyspark-basics/operators/06_exists_not_exists.ipynb) | Use subqueries, semi joins, and anti joins |
 
-  - ## [Analytical Functions](analytical_functions/README.md)
+[Read the operators overview →](pyspark-basics/operators/README.md)
 
-    - [ROW_NUMBER, RANK, and DENSE_RANK](analytical_functions/01_row_number_rank_dense_rank.ipynb)
-      - Assign row positions
-      - Understand how ties affect ranking output
+### 5. String functions
 
-    - [NTILE](analytical_functions/02_ntile.ipynb)
-      - Divide ordered rows into numbered buckets
+Clean, standardize, search, and reshape text data.
 
-    - [LAG and LEAD](analytical_functions/03_lag_lead.ipynb)
-      - Compare current rows with previous or next rows
+| Lesson | Topics |
+| --- | --- |
+| [Substring and concatenation](pyspark-basics/string_functions/01_substring_concatenation.ipynb) | Extract and combine text |
+| [LOWER and UPPER](pyspark-basics/string_functions/02_lower_upper.ipynb) | Standardize letter case |
+| [TRIM, LTRIM, and RTRIM](pyspark-basics/string_functions/03_trim_ltrim_rtrim.ipynb) | Remove unwanted spaces |
+| [CHARINDEX](pyspark-basics/string_functions/04_charindex.ipynb) | Find one string inside another |
+| [LEFT and RIGHT](pyspark-basics/string_functions/05_left_right.ipynb) | Extract text from either end |
+| [REVERSE, REPLACE, and LENGTH](pyspark-basics/string_functions/06_reverse_replace_length.ipynb) | Transform and measure strings |
 
-    - [FIRST_VALUE and LAST_VALUE](analytical_functions/04_first_last_value.ipynb)
-      - Return first or last values inside a window frame
+[Read the string functions overview →](pyspark-basics/string_functions/README.md)
 
-  - ## [Performance Tuning](performance_tuning.md)
+### 6. Aggregate functions
 
-    - [Join performance benchmark](02_join_performance_small_vs_large_files.ipynb)
-      - Load many small files and measure runtime
-      - Load fewer larger files and compare runtime
-      - Measure the difference across CSV, JSON, and Parquet
+Turn detailed records into useful totals, counts, averages, and grouped summaries.
 
-    - File layout
-      - Small files vs larger files
-      - How too many source files slow Spark loading
-      - File listing, metadata overhead, and scan planning
-      - Why fewer larger files usually process faster
+| Lesson | Topics |
+| --- | --- |
+| [COUNT](pyspark-basics/aggregate_functions/01_count.ipynb) | Count rows and non-null values |
+| [SUM and AVG](pyspark-basics/aggregate_functions/02_sum_avg.ipynb) | Calculate totals and averages |
+| [MAX and MIN](pyspark-basics/aggregate_functions/03_max_min.ipynb) | Find highest and lowest values |
+| [Aggregate by group](pyspark-basics/aggregate_functions/04_by_group.ipynb) | Summarize records by category |
 
-    - Small-file problem
-      - Source systems may send many tiny files
-      - Spark creates more scan tasks for many files
-      - Job startup and task scheduling become slower
-      - Processing time increases even when data volume is the same
+[Read the aggregate functions overview →](pyspark-basics/aggregate_functions/README.md)
 
-    - Merge small files
-      - Read small files received from source
-      - Merge or compact them into fewer larger files
-      - Use [compact_small_files.py](scripts/compact_small_files.py)
-      - Process the compacted output instead of the raw tiny files
-      - Compare before and after runtimes to show performance improvement
+### 7. Analytical functions
 
-    - File format behavior
-      - CSV parsing overhead
-      - JSON semi-structured data overhead
-      - Parquet columnar reads and compression
+Calculate rankings and row-to-row comparisons without collapsing the underlying dataset.
 
-    - Join strategy
-      - Broadcast joins
-      - Shuffle joins
-      - Data skew
+| Lesson | Topics |
+| --- | --- |
+| [ROW_NUMBER, RANK, and DENSE_RANK](pyspark-basics/analytical_functions/01_row_number_rank_dense_rank.ipynb) | Rank rows and handle ties |
+| [NTILE](pyspark-basics/analytical_functions/02_ntile.ipynb) | Divide ordered rows into buckets |
+| [LAG and LEAD](pyspark-basics/analytical_functions/03_lag_lead.ipynb) | Compare with previous and next rows |
+| [FIRST_VALUE and LAST_VALUE](pyspark-basics/analytical_functions/04_first_last_value.ipynb) | Read boundary values in a window frame |
 
-    - Update performance
-      - Compare small updates with large updates
-      - Understand full rewrites for plain files
-      - Review table formats for frequent updates
+[Read the analytical functions overview →](pyspark-basics/analytical_functions/README.md)
 
-    - Optimization techniques
-      - Compaction
-      - Merging source small files before processing
-      - `repartition()` vs `coalesce()`
-      - Partitioning by columns
-      - Caching reused DataFrames
+## Data lake operations
 
-    - Spark execution settings
-      - `spark.sql.adaptive.enabled`
-      - `spark.sql.shuffle.partitions`
-      - `spark.sql.files.maxPartitionBytes`
+Apply the course concepts to an end-to-end retail-banking pipeline backed by MinIO. The module covers source-data design, object-storage configuration, repeatable batch ingestion, small-file compaction, and validation.
 
-    - Spark UI review
-      - Jobs, stages, and tasks
-      - Shuffle read and write
-      - Task duration and spill
+| Module | What it covers |
+| --- | --- |
+| [1. Dataset design](pyspark-datalake/01_dataset_design/README.md) | Finance tables, columns, and source batch layout |
+| [2. MinIO setup](pyspark-datalake/02_minio_setup/README.md) | Docker configuration, object storage, and Spark S3A settings |
+| [3. Batch loads](pyspark-datalake/03_batch_loads/README.md) | Bulk, incremental, selected-table, and reprocessing patterns |
+| [4. Small-file compaction](pyspark-datalake/04_compaction/README.md) | Consolidating source files into efficient Parquet output |
+| [5. Validation](pyspark-datalake/05_validation/README.md) | Source checks, MinIO path checks, and PySpark queries |
 
-  - ## [Supporting Files](misc/README.md)
+### Data lake resources
 
-    - [Local PySpark setup](misc/pyspark-local-setup.md)
-    - [Python notes](misc/python.md)
-    - [Tutorial outline](misc/pyspark_tutorials.md)
-    - [Helper scripts](scripts)
-    - [Combined DQL notebook](01_dql_select_where_group_having_order.ipynb)
+- [End-to-end batch loading tutorial](pyspark-datalake/docs/batch-loads-minio.md)
+- [Generate a retail-banking dataset](pyspark-datalake/scripts/generate_retail_banking_dataset.py)
+- [Inspect generated source batches](pyspark-datalake/scripts/inspect_retail_banking_batches.py)
+- [Load batches into MinIO](pyspark-datalake/scripts/batch_load_to_minio.py)
+
+## Repository structure
+
+```text
+tinitiate-pyspark/
+├── pyspark-basics/       # Core lessons, notebooks, setup, and helper scripts
+├── pyspark-datalake/     # MinIO-backed retail-banking pipeline
+├── pyspark-notebooks/    # Combined and performance-focused notebooks
+├── performance_io.md     # File loading, extraction, errors, and update lab
+├── performance_tuning.md # Spark optimization guide
+└── README.md
+```
+
+## Additional resources
+
+- [Supporting files and setup notes](pyspark-basics/misc/README.md)
+- [PySpark tutorial outline](pyspark_tutorials.md)
+- [Training data helper scripts](pyspark-basics/scripts)
+- [Combined DQL notebook](pyspark-notebooks/01_dql_select_where_group_having_order.ipynb)
+
+## Performance tuning
+
+Move beyond correct code and learn how ingestion design, file layout, data quality, partitioning, and Spark execution strategy affect runtime.
+
+- Read large CSV extracts and up to 10,000 one-row CSV files per table
+- Benchmark many Parquet files with 100,000 rows per file
+- Extract ZIP archives safely and quarantine malformed CSV or corrupt Parquet files
+- Compare CSV and Parquet update rewrites and understand when to use a table format
+- Benchmark many small files against fewer large files across CSV, JSON, and Parquet
+- Understand scan planning, task scheduling, shuffles, broadcast joins, and data skew
+- Compare `repartition()` and `coalesce()` and tune common Spark SQL settings
+- Compact small source files before downstream processing
+- Use the Spark UI to inspect jobs, stages, tasks, spills, and shuffle activity
+
+- [Run the file I/O and data quality lab](performance_io.md)
+- [Read the performance tuning guide](performance_tuning.md)
+- [Open the join-performance notebook](pyspark-notebooks/02_join_performance_small_vs_large_files.ipynb)
+
+---
+
+<p align="center">
+  <strong>Venkata Bhattaram &amp; Jay Kumsi</strong><br>
+  © <a href="https://tinitiate.com">TINITIATE.COM</a>
+</p>

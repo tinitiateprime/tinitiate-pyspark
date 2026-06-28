@@ -32,4 +32,4 @@ Start with the join question in plain English before writing code. For example: 
 
 For large datasets, joins can be expensive because Spark may need to shuffle rows across the cluster. Filtering early, selecting only needed columns, and broadcasting small lookup tables can make joins easier to read and faster to run.
 
-[Back to main index](../README.md)
+[Back to main README](../../README.md#curriculum)

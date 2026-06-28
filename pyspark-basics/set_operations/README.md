@@ -28,4 +28,4 @@ Use `UNION ALL` when duplicates matter or when you know the inputs do not overla
 
 Use `INTERSECT` and `EXCEPT` for comparison work, such as finding records that exist in one extract but not another.
 
-[Back to main index](../README.md)
+[Back to main README](../../README.md#curriculum)
