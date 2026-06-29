@@ -5,14 +5,15 @@
 <h1 align="center">PySpark Training</h1>
 
 <p align="center">
-  A practical, notebook-based path from Spark fundamentals to performance tuning and data lake operations.
+  A practical, notebook-based path from Spark fundamentals to data lakes, PostgreSQL ingestion, and performance tuning.
 </p>
 
 <p align="center">
   <a href="#quick-start">Quick start</a> •
   <a href="#curriculum">Curriculum</a> •
-  <a href="#performance-tuning">Performance</a> •
-  <a href="#data-lake-operations">Data lake</a>
+  <a href="#data-lake-operations">Data lake</a> •
+  <a href="#pyspark-to-postgresql">PostgreSQL</a> •
+  <a href="#performance-tuning">Performance</a>
 </p>
 
 ---
@@ -191,11 +192,27 @@ Apply the course concepts to an end-to-end retail-banking pipeline backed by Min
 - [Inspect generated source batches](pyspark-datalake/scripts/inspect_retail_banking_batches.py)
 - [Load batches into MinIO](pyspark-datalake/scripts/batch_load_to_minio.py)
 
+## PySpark to PostgreSQL DB
+
+Learn to load CSV, JSON, and Parquet sources into PostgreSQL with explicit schemas, controlled JDBC concurrency, rejected-record handling, audit metrics, and restartable phases.
+
+The database course provides 11 detailed scenarios. Every scenario includes its own generated dataset, manifest, runnable PowerShell script, PostgreSQL validation, performance questions, and cleanup guidance.
+
+- Small and large files loaded into one target table
+- Source folders routed into multiple related tables
+- Customer, sales, product, location, employee, department, and project datasets
+- An opt-in stress lab for up to one million source files
+- Millions of updates and deletes through deduplicated staging and atomic SQL
+
+- [Open the PostgreSQL tutorial](pyspark-database/README.md)
+- [Browse all detailed scenarios](pyspark-database/scenarios/README.md)
+
 ## Repository structure
 
 ```text
 tinitiate-pyspark/
 ├── pyspark-basics/       # Core lessons, notebooks, setup, and helper scripts
+├── pyspark-database/     # Phase-based source-file loads into PostgreSQL
 ├── pyspark-datalake/     # MinIO-backed retail-banking pipeline
 ├── pyspark-notebooks/    # Combined and performance-focused notebooks
 ├── performance_io.md     # File loading, extraction, errors, and update lab
@@ -231,6 +248,6 @@ Move beyond correct code and learn how ingestion design, file layout, data quali
 ---
 
 <p align="center">
-  <strong>Venkata Bhattaram &amp; Jay Kumsi</strong><br>
+  <strong> Jay Kumsi & Venkata Bhattaram </strong><br>
   © <a href="https://tinitiate.com">TINITIATE.COM</a>
 </p>
