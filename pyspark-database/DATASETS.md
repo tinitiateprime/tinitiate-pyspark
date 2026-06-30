@@ -124,7 +124,7 @@ The CDC loader retains the latest `change_ts` per `transaction_id`, writes chang
 | Small files | File-open and scheduler overhead | 20 files × 10 rows/table |
 | Large files | Parse/scan and JDBC throughput | 2 files × 100,000 rows/table |
 | Ultra files | File discovery and planning stress | 10,000 files × 1 row by default; up to 1,000,000 opt-in |
-| CDC | Update/delete staging | 100 updates + 25 deletes by default |
+| CDC | Update/delete staging | 100,000 updates + 10,000 deletes in Scenario 11 |
 
 ## Generated layout
 

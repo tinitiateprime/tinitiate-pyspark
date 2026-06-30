@@ -321,6 +321,14 @@ CSV, JSON, and Parquet files do not update PostgreSQL rows by themselves. The sa
 3. Invoke PostgreSQL's `training.apply_sales_transaction_changes()` function to apply set-based `UPDATE` and `DELETE` statements atomically.
 4. Reconcile staged, rejected, updated, deleted, and missing target keys.
 
+Run the standard detailed exercise with a 200,000-row base, 100,000 updates, and 10,000 deletes:
+
+```powershell
+./pyspark-database/scenarios/11_millions_updates_deletes/run.ps1
+```
+
+Expected result: 100,000 rows updated, 10,000 rows deleted, 0 unmatched changes, and 190,000 rows remaining.
+
 First load a base `sales_transaction` dataset. Then apply the default CDC files:
 
 ```powershell

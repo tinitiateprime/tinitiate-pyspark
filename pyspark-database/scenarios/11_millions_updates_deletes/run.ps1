@@ -1,9 +1,9 @@
 param(
     [int] $BaseFileCount = 2,
-    [int] $BaseRowsPerFile = 100,
-    [int] $UpdateCount = 100,
-    [int] $DeleteCount = 25,
-    [int] $ChangesPerFile = 100,
+    [int] $BaseRowsPerFile = 100000,
+    [int] $UpdateCount = 100000,
+    [int] $DeleteCount = 10000,
+    [int] $ChangesPerFile = 10000,
     [ValidateSet("csv", "json", "parquet")] [string] $ChangeFormat = "parquet",
     [switch] $ConfirmMillions
 )
@@ -55,6 +55,8 @@ Write-Phase 6 "Reconcile updated, deleted, unmatched, and remaining rows"
 Invoke-TutorialQuery -Sql "SELECT COUNT(*) AS rows_after_cdc FROM training.sales_transaction;"
 Invoke-TutorialQuery -Sql "SELECT COUNT(*) AS staging_rows_after_commit FROM training.sales_transaction_changes_staging;"
 Invoke-TutorialQuery -Sql "SELECT scenario, accepted_rows, rejected_rows, read_seconds, write_seconds FROM training.load_audit WHERE scenario = '$scenario-base' ORDER BY load_id DESC LIMIT 1;"
+$expectedRemaining = ($BaseFileCount * $BaseRowsPerFile) - $DeleteCount
+Write-Host "Expected CDC result: updated=$UpdateCount deleted=$DeleteCount remaining=$expectedRemaining unmatched=0"
 
 Write-Phase 7 "Review transaction design and cleanup"
 Write-Host "Generated changes: $UpdateCount updates + $DeleteCount deletes = $totalChanges"

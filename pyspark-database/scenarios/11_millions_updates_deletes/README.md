@@ -11,12 +11,14 @@ Apply large change files to `training.sales_transaction` through validated Spark
 | Property | Default lab |
 | --- | ---: |
 | Base Parquet files | 2 |
-| Base rows/file | 100 |
-| Base rows | 200 |
-| Updates | 100 |
-| Deletes | 25 |
+| Base rows/file | 100,000 |
+| Base rows | 200,000 |
+| Updates | 100,000 |
+| Deletes | 10,000 |
+| Change rows/file | 10,000 |
+| Change files/format | 11 |
 | Change format | Parquet |
-| Expected remaining rows | 175 |
+| Expected remaining rows | 190,000 |
 
 Generated root: `data/database_scenarios/11_millions_updates_deletes`.
 
@@ -25,6 +27,8 @@ Generated root: `data/database_scenarios/11_millions_updates_deletes`.
 ```powershell
 ./pyspark-database/scenarios/11_millions_updates_deletes/run.ps1
 ```
+
+The default run creates 100,000 update events followed by 10,000 delete events. All 110,000 keys exist in the 200,000-row base table.
 
 Run five million updates and one million deletes only after the default succeeds:
 
@@ -69,7 +73,17 @@ No per-row database loop is used.
 
 The script checks remaining target rows, empty staging, and base-load audit data. CDC output reports accepted, rejected, staged, updated, deleted, and unmatched counts.
 
-Default expectation: 200 base − 25 deletes = 175 remaining rows. Updates change values without changing the count.
+Default expectation:
+
+```text
+200,000 base rows
+100,000 rows updated (row count unchanged)
+ 10,000 rows deleted
+-------------------
+190,000 rows remaining
+```
+
+The atomic PostgreSQL function should report `updated_target_rows = 100000`, `deleted_target_rows = 10000`, and `unmatched_target_changes = 0`.
 
 ## Phase 7: Review and cleanup
 
