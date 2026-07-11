@@ -22,6 +22,9 @@ Start at the [scenario index](scenarios/README.md). Each scenario has two files:
 
 - `README.md` explains the dataset, expected results, architecture, performance questions, and every learning phase.
 - `run.ps1` executes those phases in order: prerequisites, generation, inspection, Spark load, PostgreSQL validation, review, and cleanup guidance.
+- `generate_source.py` generates that scenario's CSV, JSON, or Parquet files independently.
+
+For the MinIO-based version of every scenario, follow [MinIO source files to PostgreSQL](MINIO_TO_POSTGRES_SCENARIOS.md).
 
 Run the scenarios in this suggested order:
 
@@ -55,8 +58,10 @@ Use the [data dictionary](DATASETS.md) for every table, column, key, relationshi
 
 ```text
 pyspark-database/
+├── ti-data-engineering-docker-compose.yml  # Full Docker stack: PostgreSQL, MinIO, Spark, Jupyter, Kafka, Airflow
 ├── docker-compose.yml
 ├── DATASETS.md                  # Table schemas, relationships, and data profiles
+├── MINIO_TO_POSTGRES_SCENARIOS.md
 ├── postgres.env.example
 ├── requirements.txt
 ├── scenarios/                  # One detailed lesson and run script per scenario
@@ -65,38 +70,57 @@ pyspark-database/
 └── scripts/
     ├── apply_sales_transaction_cdc.py
     ├── generate_database_sources.py
+    ├── publish_minio_lab.py
+    ├── upload_sources_to_minio.py
     └── load_files_to_postgres.py
 ```
 
 Generated source data is written under `data/` and is ignored by Git.
 
-## 1. Start PostgreSQL
+## 1. Start PostgreSQL and MinIO
 
-Create a local environment file and change the example password:
+For the MinIO-to-PostgreSQL lab, use the full data engineering Docker stack:
 
-```powershell
-Copy-Item pyspark-database/postgres.env.example pyspark-database/.env
-docker compose --env-file pyspark-database/.env -f pyspark-database/docker-compose.yml up -d
-docker compose --env-file pyspark-database/.env -f pyspark-database/docker-compose.yml ps
+```cmd
+docker compose -f pyspark-database/ti-data-engineering-docker-compose.yml up -d
+docker ps
 ```
 
-The first startup runs [`01_schema.sql`](sql/01_schema.sql) and creates the `training` schema, target tables, CDC staging table, audit table, and indexes.
+This starts:
 
-The tutorial publishes PostgreSQL on host port `5433`, leaving the existing `ti-batch-postgres` service on `5432` untouched.
+- PostgreSQL container `postgres` on `localhost:5432`
+- MinIO container `minio` on `localhost:9000`
+- MinIO browser console on `http://localhost:9001`
+- Jupyter on `http://localhost:8888`
+- Spark master and worker services
 
-> [!NOTE]
-> PostgreSQL initialization scripts run only when the Docker volume is empty. To apply later schema edits, run the SQL explicitly or deliberately recreate the training volume.
+The compose file starts PostgreSQL. Apply [`01_schema.sql`](sql/01_schema.sql) after the container is running to create the `training` schema, target tables, CDC staging table, audit table, and indexes.
 
-Check the schema:
+If your instructor already has `postgres` and `minio` running, keep using those containers and do not start duplicate containers.
 
-```powershell
-docker exec -it pyspark-training-postgres psql -U pyspark_user -d pyspark_training -c "\dt training.*"
+Apply and check the schema:
+
+```cmd
+docker exec -e PGPASSWORD=tiuser!23456 postgres psql -v ON_ERROR_STOP=1 -U ti_dbuser -d tinitiateai -f /lab/sql/01_schema.sql
+docker exec -e PGPASSWORD=tiuser!23456 postgres psql -U ti_dbuser -d tinitiateai -c "\dt training.*"
 ```
+
+The Docker compose file mounts [`01_schema.sql`](sql/01_schema.sql) into the PostgreSQL container at `/lab/sql/01_schema.sql`. The command above runs the DDL inside Docker using these lab database credentials:
+
+- Database: `tinitiateai`
+- User: `ti_dbuser`
+- Password: `tiuser!23456`
 
 ## 2. Prepare Python and JDBC
 
-```powershell
-python -m pip install -r pyspark-database/requirements.txt
+```cmd
+C:\Python311\python.exe -m pip install --user -r pyspark-database/requirements.txt
+```
+
+For MinIO publishing only, this smaller install is enough:
+
+```cmd
+C:\Python311\python.exe -m pip install --user minio pyarrow
 ```
 
 The examples use the PostgreSQL JDBC driver package:
@@ -105,19 +129,27 @@ The examples use the PostgreSQL JDBC driver package:
 org.postgresql:postgresql:42.7.4
 ```
 
-Set credentials in the shell instead of putting passwords in scripts:
+Set credentials in the shell:
 
-```powershell
-$env:POSTGRES_JDBC_URL = "jdbc:postgresql://localhost:5433/pyspark_training"
-$env:POSTGRES_USER = "pyspark_user"
-$env:POSTGRES_PASSWORD = "change_me"
+```cmd
+set POSTGRES_JDBC_URL=jdbc:postgresql://localhost:5432/tinitiateai
+set POSTGRES_USER=ti_dbuser
+set POSTGRES_PASSWORD=tiuser!23456
+
+set MINIO_ENDPOINT=http://localhost:9000
+set MINIO_ACCESS_KEY=minio
+set MINIO_SECRET_KEY=minio123
+set MINIO_BUCKET=datalake
 ```
 
-When Spark runs inside the existing Jupyter Docker container, use `host.docker.internal` instead of `localhost`:
+When Spark runs inside the Docker/Jupyter container, use container names instead of `localhost`:
 
-```powershell
-$env:POSTGRES_JDBC_URL = "jdbc:postgresql://host.docker.internal:5433/pyspark_training"
+```cmd
+set POSTGRES_JDBC_URL=jdbc:postgresql://postgres:5432/tinitiateai
+set MINIO_ENDPOINT=http://minio:9000
 ```
+
+For the full MinIO workflow, including bucket paths and scenario commands, use [MinIO source files to PostgreSQL](MINIO_TO_POSTGRES_SCENARIOS.md).
 
 ## 3. Generate the source scenarios
 
@@ -357,9 +389,9 @@ Never issue one database statement per change row. Millions of network round tri
 ## 10. Validate the results
 
 ```powershell
-docker exec -it pyspark-training-postgres psql -U pyspark_user -d pyspark_training -c "SELECT COUNT(*) FROM training.customer;"
-docker exec -it pyspark-training-postgres psql -U pyspark_user -d pyspark_training -c "SELECT * FROM training.load_audit ORDER BY load_id DESC LIMIT 20;"
-docker exec -it pyspark-training-postgres psql -U pyspark_user -d pyspark_training -c "SELECT COUNT(*) FROM training.sales_transaction;"
+docker exec -e PGPASSWORD='tiuser!23456' postgres psql -U ti_dbuser -d tinitiateai -c "SELECT COUNT(*) FROM training.customer;"
+docker exec -e PGPASSWORD='tiuser!23456' postgres psql -U ti_dbuser -d tinitiateai -c "SELECT * FROM training.load_audit ORDER BY load_id DESC LIMIT 20;"
+docker exec -e PGPASSWORD='tiuser!23456' postgres psql -U ti_dbuser -d tinitiateai -c "SELECT COUNT(*) FROM training.sales_transaction;"
 ```
 
 After a large load or major update/delete exercise:
@@ -413,3 +445,4 @@ For restartability:
 - Keep dead-letter records separate from files waiting for infrastructure retry.
 
 [Back to the main README](../README.md#pyspark-to-postgresql)
+

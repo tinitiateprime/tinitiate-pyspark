@@ -97,15 +97,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--scenario", default="manual")
     parser.add_argument(
         "--jdbc-url",
-        default=os.environ.get("POSTGRES_JDBC_URL", "jdbc:postgresql://localhost:5433/pyspark_training"),
+        default=os.environ.get("POSTGRES_JDBC_URL", "jdbc:postgresql://localhost:5432/tinitiateai"),
     )
-    parser.add_argument("--db-user", default=os.environ.get("POSTGRES_USER", "pyspark_user"))
-    parser.add_argument("--db-password", default=os.environ.get("POSTGRES_PASSWORD", "pyspark_password"))
+    parser.add_argument("--db-user", default=os.environ.get("POSTGRES_USER", "ti_dbuser"))
+    parser.add_argument("--db-password", default=os.environ.get("POSTGRES_PASSWORD", "tiuser!23456"))
     parser.add_argument("--write-mode", choices=["append", "overwrite"], default="append")
     parser.add_argument("--write-partitions", type=int, default=4)
     parser.add_argument("--batch-size", type=int, default=10_000)
     parser.add_argument("--expected-files", type=int)
     parser.add_argument("--reject-path", default="data/database_rejects")
+    parser.add_argument("--minio-endpoint", default=os.environ.get("MINIO_ENDPOINT", "http://localhost:9000"))
+    parser.add_argument("--minio-access-key", default=os.environ.get("MINIO_ACCESS_KEY", "minio"))
+    parser.add_argument("--minio-secret-key", default=os.environ.get("MINIO_SECRET_KEY", "minio123"))
     return parser.parse_args()
 
 
@@ -200,12 +203,8 @@ def write_audit(spark: SparkSession, args: argparse.Namespace, metrics: dict[str
     )
 
 
-def main() -> None:
-    args = parse_args()
-    validate_args(args)
+def run_load(spark: SparkSession, args: argparse.Namespace) -> None:
     started_at = datetime.now(timezone.utc).replace(tzinfo=None)
-    spark = SparkSession.builder.appName(f"files-to-postgres-{args.target_table}").getOrCreate()
-    spark.sparkContext.setLogLevel("WARN")
 
     try:
         read_started = perf_counter()
@@ -262,6 +261,28 @@ def main() -> None:
     finally:
         if "validated" in locals():
             validated.unpersist()
+
+
+def main() -> None:
+    args = parse_args()
+    validate_args(args)
+    builder = SparkSession.builder.appName(f"files-to-postgres-{args.target_table}")
+    if args.source_path.startswith("s3a://"):
+        builder = (
+            builder
+            .config("spark.hadoop.fs.s3a.endpoint", args.minio_endpoint)
+            .config("spark.hadoop.fs.s3a.access.key", args.minio_access_key)
+            .config("spark.hadoop.fs.s3a.secret.key", args.minio_secret_key)
+            .config("spark.hadoop.fs.s3a.path.style.access", "true")
+            .config("spark.hadoop.fs.s3a.connection.ssl.enabled", str(args.minio_endpoint.startswith("https")).lower())
+            .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
+        )
+    spark = builder.getOrCreate()
+    spark.sparkContext.setLogLevel("WARN")
+
+    try:
+        run_load(spark, args)
+    finally:
         spark.stop()
 
 

@@ -83,6 +83,65 @@ COLUMNS = {
 }
 
 
+FIRST_NAMES = [
+    "Aarav",
+    "Aisha",
+    "Carlos",
+    "Chloe",
+    "Daniel",
+    "Elena",
+    "Fatima",
+    "Gabriel",
+    "Hannah",
+    "Ishaan",
+    "Jasmine",
+    "Kenji",
+    "Liam",
+    "Maya",
+    "Noah",
+    "Olivia",
+    "Priya",
+    "Rohan",
+    "Sofia",
+    "Zoe",
+]
+
+LAST_NAMES = [
+    "Anderson",
+    "Bennett",
+    "Chen",
+    "Diaz",
+    "Evans",
+    "Garcia",
+    "Hassan",
+    "Iyer",
+    "Johnson",
+    "Kim",
+    "Lopez",
+    "Miller",
+    "Nair",
+    "Patel",
+    "Rivera",
+    "Sharma",
+    "Singh",
+    "Thomas",
+    "Walker",
+    "Young",
+]
+
+
+def person_name(row_num: int) -> str:
+    first = FIRST_NAMES[(row_num - 1) % len(FIRST_NAMES)]
+    last = LAST_NAMES[((row_num - 1) // len(FIRST_NAMES)) % len(LAST_NAMES)]
+    suffix = ((row_num - 1) // (len(FIRST_NAMES) * len(LAST_NAMES))) + 1
+    return f"{first} {last}" if suffix == 1 else f"{first} {last} {suffix}"
+
+
+def person_email(row_num: int) -> str:
+    name = person_name(row_num).lower().replace(" ", ".")
+    return f"{name}@example.com"
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", default="data/database_sources")
@@ -99,6 +158,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--ultra-file-count", type=int, default=1_000_000)
     parser.add_argument("--ultra-rows-per-file", type=int, default=1)
     parser.add_argument("--ultra-format", choices=["csv", "json", "parquet"], default="json")
+    parser.add_argument(
+        "--all-formats",
+        action="store_true",
+        help="Generate equivalent CSV, JSON, and Parquet folders for each requested scenario.",
+    )
     parser.add_argument("--allow-ultra", action="store_true")
     parser.add_argument("--cdc-updates", type=int, default=100)
     parser.add_argument("--cdc-deletes", type=int, default=25)
@@ -170,8 +234,8 @@ def row_for(table: str, row_num: int) -> dict[str, object]:
     if table == "customer":
         return {
             "customer_id": row_num,
-            "customer_name": f"customer_{row_num:09d}",
-            "email": f"customer_{row_num:09d}@example.com",
+            "customer_name": person_name(row_num),
+            "email": person_email(row_num),
             "location_id": location_id,
             "created_at": iso_datetime(row_num % 365),
         }
@@ -293,23 +357,31 @@ def generate_named_scenario(output_dir: Path, scenario: str, args: argparse.Name
         file_count, rows_per_file = args.small_file_count, args.small_rows_per_file
     else:
         file_count, rows_per_file = args.large_file_count, args.large_rows_per_file
-    details = [
-        generate_table(output_dir / folder, fmt, table, file_count, rows_per_file)
-        for table in tables
-    ]
+    formats = ("csv", "json", "parquet") if args.all_formats else (fmt,)
+    details = []
+    for source_format in formats:
+        root = output_dir / folder / source_format if args.all_formats else output_dir / folder
+        details.extend(
+            generate_table(root, source_format, table, file_count, rows_per_file)
+            for table in tables
+        )
     write_manifest(output_dir, scenario, details)
 
 
 def generate_ultra(output_dir: Path, args: argparse.Namespace) -> None:
-    details = [
-        generate_table(
-            output_dir / "10_ultra_sales_transaction",
-            args.ultra_format,
-            "sales_transaction",
-            args.ultra_file_count,
-            args.ultra_rows_per_file,
+    formats = ("csv", "json", "parquet") if args.all_formats else (args.ultra_format,)
+    details = []
+    for source_format in formats:
+        root = output_dir / "10_ultra_sales_transaction" / source_format if args.all_formats else output_dir / "10_ultra_sales_transaction"
+        details.append(
+            generate_table(
+                root,
+                source_format,
+                "sales_transaction",
+                args.ultra_file_count,
+                args.ultra_rows_per_file,
+            )
         )
-    ]
     write_manifest(output_dir, "ultra", details)
 
 

@@ -1,2 +1,4 @@
 data/
 pyspark-database/.env
+__pycache__/
+*.py[cod]

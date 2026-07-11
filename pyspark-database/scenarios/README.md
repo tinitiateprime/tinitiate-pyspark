@@ -13,6 +13,8 @@ Every scenario follows the same learning phases:
 
 Scenario 11 adds a separate atomic CDC phase and reconciliation phase.
 
+Each scenario directory also contains an independent `generate_source.py`. The complete generate → MinIO → PostgreSQL student exercise is in [MinIO source files to PostgreSQL](../MINIO_TO_POSTGRES_SCENARIOS.md).
+
 | # | Detailed lesson | Runnable script | Source → target |
 | --- | --- | --- | --- |
 | 01 | [Many small JSON files to customer](01_many_small_json_customer/README.md) | [`run.ps1`](01_many_small_json_customer/run.ps1) | JSON → `customer` |

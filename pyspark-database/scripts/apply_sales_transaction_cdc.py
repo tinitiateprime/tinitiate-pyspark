@@ -20,13 +20,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--source-format", choices=["csv", "json", "parquet"], required=True)
     parser.add_argument(
         "--jdbc-url",
-        default=os.environ.get("POSTGRES_JDBC_URL", "jdbc:postgresql://localhost:5433/pyspark_training"),
+        default=os.environ.get("POSTGRES_JDBC_URL", "jdbc:postgresql://localhost:5432/tinitiateai"),
     )
-    parser.add_argument("--db-user", default=os.environ.get("POSTGRES_USER", "pyspark_user"))
-    parser.add_argument("--db-password", default=os.environ.get("POSTGRES_PASSWORD", "pyspark_password"))
+    parser.add_argument("--db-user", default=os.environ.get("POSTGRES_USER", "ti_dbuser"))
+    parser.add_argument("--db-password", default=os.environ.get("POSTGRES_PASSWORD", "tiuser!23456"))
     parser.add_argument("--write-partitions", type=int, default=4)
     parser.add_argument("--batch-size", type=int, default=10_000)
     parser.add_argument("--reject-path", default="data/database_rejects/cdc")
+    parser.add_argument("--minio-endpoint", default=os.environ.get("MINIO_ENDPOINT", "http://localhost:9000"))
+    parser.add_argument("--minio-access-key", default=os.environ.get("MINIO_ACCESS_KEY", "minio"))
+    parser.add_argument("--minio-secret-key", default=os.environ.get("MINIO_SECRET_KEY", "minio123"))
     return parser.parse_args()
 
 
@@ -131,7 +134,18 @@ def main() -> None:
     if args.write_partitions <= 0 or args.batch_size <= 0:
         raise ValueError("--write-partitions and --batch-size must be greater than zero.")
 
-    spark = SparkSession.builder.appName("apply-sales-transaction-cdc").getOrCreate()
+    builder = SparkSession.builder.appName("apply-sales-transaction-cdc")
+    if args.source_path.startswith("s3a://"):
+        builder = (
+            builder
+            .config("spark.hadoop.fs.s3a.endpoint", args.minio_endpoint)
+            .config("spark.hadoop.fs.s3a.access.key", args.minio_access_key)
+            .config("spark.hadoop.fs.s3a.secret.key", args.minio_secret_key)
+            .config("spark.hadoop.fs.s3a.path.style.access", "true")
+            .config("spark.hadoop.fs.s3a.connection.ssl.enabled", str(args.minio_endpoint.startswith("https")).lower())
+            .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
+        )
+    spark = builder.getOrCreate()
     spark.sparkContext.setLogLevel("WARN")
     try:
         validated = validate_changes(read_changes(spark, args)).cache()

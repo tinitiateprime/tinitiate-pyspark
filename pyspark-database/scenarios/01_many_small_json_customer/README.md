@@ -34,7 +34,7 @@ Scale the experiment without editing code:
 
 ## Phase 1: Check prerequisites
 
-The script verifies that Python and Docker are available and that `pyspark-training-postgres` is running. PostgreSQL remains isolated on host port `5433`.
+The script verifies that Python and Docker are available and that `ti-batch-postgres` is running on the training Docker stack.
 
 ## Phase 2: Generate the dataset
 

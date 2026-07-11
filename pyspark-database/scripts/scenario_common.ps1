@@ -18,7 +18,7 @@ function Write-Phase {
 }
 
 function Assert-TutorialPrerequisites {
-    param([string] $PostgresContainer = "pyspark-training-postgres")
+    param([string] $PostgresContainer = "postgres")
 
     $null = Get-Command python -ErrorAction Stop
     $null = Get-Command docker -ErrorAction Stop
@@ -78,25 +78,33 @@ function Invoke-PySparkLoad {
         [int] $WritePartitions = 4,
         [int] $BatchSize = 10000,
         [ValidateSet("append", "overwrite")] [string] $WriteMode = "overwrite",
-        [string] $JdbcUrl = "jdbc:postgresql://host.docker.internal:5433/pyspark_training",
-        [string] $DbUser = "pyspark_user",
-        [string] $DbPassword = "pyspark_password",
+        [string] $JdbcUrl = "jdbc:postgresql://postgres:5432/tinitiateai",
+        [string] $DbUser = "ti_dbuser",
+        [string] $DbPassword = "tiuser!23456",
+        [string] $MinioEndpoint = "http://minio:9000",
+        [string] $MinioAccessKey = "minio",
+        [string] $MinioSecretKey = "minio123",
+        [string] $DockerNetwork = "pyspark-database_default",
         [string] $SparkImage = "jupyter/pyspark-notebook:latest"
     )
 
     $containerSource = $SourcePath.Replace("\", "/")
     $containerName = "pyspark-db-$($TargetTable.Replace('_', '-'))-$([Guid]::NewGuid().ToString('N').Substring(0, 8))"
     docker run --rm --name $containerName `
+        --network $DockerNetwork `
         -e "POSTGRES_JDBC_URL=$JdbcUrl" `
         -e "POSTGRES_USER=$DbUser" `
         -e "POSTGRES_PASSWORD=$DbPassword" `
+        -e "MINIO_ENDPOINT=$MinioEndpoint" `
+        -e "MINIO_ACCESS_KEY=$MinioAccessKey" `
+        -e "MINIO_SECRET_KEY=$MinioSecretKey" `
         -v "${script:RepoRoot}:/home/jovyan/work/repo" `
         -w /home/jovyan/work/repo `
         $SparkImage `
         spark-submit `
         --conf spark.jars.ivy=/home/jovyan/work/repo/data/ivy-cache `
         --conf spark.ui.showConsoleProgress=false `
-        --packages org.postgresql:postgresql:42.7.4 `
+        --packages org.postgresql:postgresql:42.7.4,org.apache.hadoop:hadoop-aws:3.3.4 `
         $script:Loader `
         --source-path $containerSource `
         --source-format $SourceFormat `
@@ -117,25 +125,33 @@ function Invoke-PySparkCdc {
         [Parameter(Mandatory)] [ValidateSet("csv", "json", "parquet")] [string] $SourceFormat,
         [int] $WritePartitions = 4,
         [int] $BatchSize = 10000,
-        [string] $JdbcUrl = "jdbc:postgresql://host.docker.internal:5433/pyspark_training",
-        [string] $DbUser = "pyspark_user",
-        [string] $DbPassword = "pyspark_password",
+        [string] $JdbcUrl = "jdbc:postgresql://postgres:5432/tinitiateai",
+        [string] $DbUser = "ti_dbuser",
+        [string] $DbPassword = "tiuser!23456",
+        [string] $MinioEndpoint = "http://minio:9000",
+        [string] $MinioAccessKey = "minio",
+        [string] $MinioSecretKey = "minio123",
+        [string] $DockerNetwork = "pyspark-database_default",
         [string] $SparkImage = "jupyter/pyspark-notebook:latest"
     )
 
     $containerSource = $SourcePath.Replace("\", "/")
     $containerName = "pyspark-db-cdc-$([Guid]::NewGuid().ToString('N').Substring(0, 8))"
     docker run --rm --name $containerName `
+        --network $DockerNetwork `
         -e "POSTGRES_JDBC_URL=$JdbcUrl" `
         -e "POSTGRES_USER=$DbUser" `
         -e "POSTGRES_PASSWORD=$DbPassword" `
+        -e "MINIO_ENDPOINT=$MinioEndpoint" `
+        -e "MINIO_ACCESS_KEY=$MinioAccessKey" `
+        -e "MINIO_SECRET_KEY=$MinioSecretKey" `
         -v "${script:RepoRoot}:/home/jovyan/work/repo" `
         -w /home/jovyan/work/repo `
         $SparkImage `
         spark-submit `
         --conf spark.jars.ivy=/home/jovyan/work/repo/data/ivy-cache `
         --conf spark.ui.showConsoleProgress=false `
-        --packages org.postgresql:postgresql:42.7.4 `
+        --packages org.postgresql:postgresql:42.7.4,org.apache.hadoop:hadoop-aws:3.3.4 `
         $script:CdcLoader `
         --source-path $containerSource `
         --source-format $SourceFormat `
@@ -149,12 +165,13 @@ function Invoke-PySparkCdc {
 function Invoke-TutorialQuery {
     param(
         [Parameter(Mandatory)] [string] $Sql,
-        [string] $PostgresContainer = "pyspark-training-postgres",
-        [string] $Database = "pyspark_training",
-        [string] $DbUser = "pyspark_user"
+        [string] $PostgresContainer = "postgres",
+        [string] $Database = "tinitiateai",
+        [string] $DbUser = "ti_dbuser",
+        [string] $DbPassword = "tiuser!23456"
     )
 
-    docker exec $PostgresContainer psql -U $DbUser -d $Database -v ON_ERROR_STOP=1 -P pager=off -c $Sql
+    docker exec -e "PGPASSWORD=$DbPassword" $PostgresContainer psql -U $DbUser -d $Database -v ON_ERROR_STOP=1 -P pager=off -c $Sql
     if ($LASTEXITCODE -ne 0) {
         throw "PostgreSQL validation query failed with exit code $LASTEXITCODE."
     }

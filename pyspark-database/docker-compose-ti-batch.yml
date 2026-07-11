@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg15
+    container_name: ti-batch-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: tinitiateai
+      POSTGRES_USER: ti_dbuser
+      POSTGRES_PASSWORD: tiuser!23456
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256 --auth-local=scram-sha-256
+    ports:
+      - "5432:5432"
+    volumes:
+      - ti_batch_postgres_data:/var/lib/postgresql/data
+      - ./sql/01_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ti_dbuser -d tinitiateai"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - tinitiate
+
+  minio:
+    image: minio/minio:latest
+    container_name: ti-batch-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - ti_batch_minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - tinitiate
+
+volumes:
+  ti_batch_postgres_data:
+  ti_batch_minio_data:
+
+networks:
+  tinitiate:
+    name: tinitiate
+    driver: bridge
