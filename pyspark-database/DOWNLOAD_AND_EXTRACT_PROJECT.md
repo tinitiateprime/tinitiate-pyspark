@@ -19,8 +19,6 @@ Click on 1 to copy the link and paste it in the cmd .
 ![alt text](image-4.png)
 This will clone the github repository to your local drive.
 
-Extract the repository into:
-
 ```text
 C:\tinitiate_pyspark
 ```
