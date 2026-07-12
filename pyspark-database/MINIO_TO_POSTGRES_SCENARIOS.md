@@ -73,6 +73,8 @@ Or:
 python pyspark-database/scripts/publish_minio_lab.py --skip-generate
 ```
 
+Important: run this upload step after starting or recreating the Docker stack. If MinIO was recreated, the `datalake` bucket will be empty until this script uploads the files again.
+
 What happens:
 
 1. The script uses the existing files under `data/database_scenarios`.
@@ -175,11 +177,11 @@ The main student script is:
 
 This script is simple for students because the default values are already inside the script:
 
-- MinIO endpoint inside Docker: `http://ti-batch-minio:9000`
+- MinIO endpoint inside Docker: `http://minio:9000`
 - MinIO bucket: `datalake`
 - MinIO access key: `minio`
 - MinIO secret key: `minio123`
-- PostgreSQL JDBC URL inside Docker: `jdbc:postgresql://ti-batch-postgres:5432/tinitiateai`
+- PostgreSQL JDBC URL inside Docker: `jdbc:postgresql://postgres:5432/tinitiateai`
 - PostgreSQL user: `ti_dbuser`
 - PostgreSQL password: `tiuser!23456`
 - PostgreSQL schema: `training`
@@ -503,3 +505,18 @@ C:\Python311\python.exe pyspark-database/scripts/publish_minio_lab.py --skip-gen
 ```
 
 If old folders were created with different names, delete them from the MinIO console before republishing.
+
+If Spark shows this error:
+
+```text
+The specified bucket does not exist
+NoSuchBucket
+```
+
+it means the `datalake` bucket is not in MinIO yet. Run the upload script again:
+
+```cmd
+C:\Python311\python.exe pyspark-database/scripts/publish_minio_lab.py --skip-generate
+```
+
+Then run the PySpark load command again.

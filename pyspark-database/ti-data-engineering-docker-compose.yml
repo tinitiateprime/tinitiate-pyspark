@@ -1,7 +1,7 @@
 services:
 
   postgres:
-    image: pgvector/pgvector:pg15
+    image: postgres:16
     container_name: ti-batch-postgres
     environment:
       POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256 --auth-local=scram-sha-256
@@ -11,7 +11,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ti_pyspark_postgres_data:/var/lib/postgresql/data
       - ./sql:/lab/sql:ro
       - ./sql/01_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
 
@@ -63,5 +63,5 @@ services:
       JUPYTER_TOKEN: admin123
 
 volumes:
-  postgres_data:
+  ti_pyspark_postgres_data:
   minio_data:

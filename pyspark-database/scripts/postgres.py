@@ -86,7 +86,7 @@ def default_minio_endpoint() -> str:
     if "MINIO_ENDPOINT" in os.environ:
         return os.environ["MINIO_ENDPOINT"]
     if running_inside_docker():
-        return "http://ti-batch-minio:9000"
+        return "http://minio:9000"
     return "http://localhost:9000"
 
 
@@ -94,7 +94,7 @@ def default_postgres_jdbc_url() -> str:
     if "POSTGRES_JDBC_URL" in os.environ:
         return os.environ["POSTGRES_JDBC_URL"]
     if running_inside_docker():
-        return "jdbc:postgresql://ti-batch-postgres:5432/tinitiateai"
+        return "jdbc:postgresql://postgres:5432/tinitiateai"
     return "jdbc:postgresql://localhost:5432/tinitiateai"
 
 
