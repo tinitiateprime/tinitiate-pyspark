@@ -143,13 +143,6 @@ Password: tiuser!23456
 ![alt text](image-3.png)
 
  
-
-
-
- 
-
-When DBeaver asks to download the PostgreSQL driver, click `Download`.
-
 After connecting, expand:
 
 ```text
