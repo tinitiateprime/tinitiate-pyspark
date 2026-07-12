@@ -126,7 +126,8 @@ then click on New Database connection
 Now Click on PostgresSQL
 
 ![alt text](image-2.png)
- 
+
+``` 
  Enter 
       1. Host: localhost
 
@@ -138,10 +139,10 @@ Now Click on PostgresSQL
 
       5. Password: tiuser!23456
 ```
-
-
+ 
 ![alt text](image-3.png)
-```
+
+ 
 
 
 Use these connection details:
