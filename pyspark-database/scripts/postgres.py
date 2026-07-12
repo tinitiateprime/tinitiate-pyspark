@@ -3,7 +3,7 @@
 
 Default student run:
 
-    docker exec ti-batch-jupyter python /home/jovyan/work/pyspark-database/scripts/postgres.py
+    docker exec ti-batch-jupyter spark-submit --packages "org.postgresql:postgresql:42.7.4,org.apache.hadoop:hadoop-aws:3.3.4" /home/jovyan/work/pyspark-database/scripts/postgres.py
 
 No parameters are required for the normal lab. By default this script loads:
 
@@ -152,8 +152,8 @@ def stop_if_windows_python_without_hadoop() -> None:
 
     raise SystemExit(
         "This script starts PySpark. On Windows, local PySpark needs HADOOP_HOME/winutils.exe.\n\n"
-        "For this lab, run the script inside Docker instead:\n\n"
-        "  docker exec ti-batch-jupyter python /home/jovyan/work/pyspark-database/scripts/postgres.py\n\n"
+        "For this lab, run the script inside Docker with spark-submit instead:\n\n"
+        "  docker exec ti-batch-jupyter spark-submit --packages \"org.postgresql:postgresql:42.7.4,org.apache.hadoop:hadoop-aws:3.3.4\" /home/jovyan/work/pyspark-database/scripts/postgres.py\n\n"
         "Run that command from the project folder after Docker is started."
     )
 

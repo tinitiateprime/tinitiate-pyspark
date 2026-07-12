@@ -201,6 +201,47 @@ ti-batch-spark-master
 ti-batch-spark-worker
 ```
 
+Verify that the project files are visible inside the Jupyter container:
+
+```cmd
+docker exec ti-batch-jupyter ls /home/jovyan/work
+```
+
+You should see folders such as:
+
+```text
+pyspark-basics
+pyspark-database
+pyspark-datalake
+```
+
+If `/home/jovyan/work` is empty, the container was created with an old folder mount. Recreate the Docker stack:
+
+```cmd
+docker compose -f pyspark-database/ti-data-engineering-docker-compose.yml up -d --force-recreate
+```
+
+If Docker shows a container name conflict such as:
+
+```text
+The container name "/ti-batch-minio" is already in use
+```
+
+it means an old container with that name already exists. Remove only the old containers, then start again:
+
+```cmd
+docker rm -f ti-batch-minio ti-batch-spark-master ti-batch-spark-worker ti-batch-jupyter ti-batch-postgres
+docker compose -f pyspark-database/ti-data-engineering-docker-compose.yml up -d
+```
+
+This removes containers only. It does not delete Docker volumes unless `docker volume rm` or `docker compose down -v` is used.
+
+Then check again:
+
+```cmd
+docker exec ti-batch-jupyter ls /home/jovyan/work
+```
+
 ## STEP 4: Create PostgreSQL training tables
 
 PostgreSQL is running now, but the lab tables are not created yet.

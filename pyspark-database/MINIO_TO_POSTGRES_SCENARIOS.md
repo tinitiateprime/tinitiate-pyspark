@@ -156,7 +156,7 @@ Students do not need to pass any parameters for the normal lab run.
 Run this command from the project folder:
 
 ```cmd
-docker exec ti-batch-jupyter python /home/jovyan/work/pyspark-database/scripts/postgres.py
+docker exec ti-batch-jupyter spark-submit --packages "org.postgresql:postgresql:42.7.4,org.apache.hadoop:hadoop-aws:3.3.4" /home/jovyan/work/pyspark-database/scripts/postgres.py
 ```
 
 Important: this command runs PySpark inside the Docker `ti-batch-jupyter` container. This avoids the Windows `HADOOP_HOME` / `winutils.exe` error that can happen when PySpark is run directly with Windows Python.
@@ -190,6 +190,14 @@ The script also downloads the required Spark packages automatically the first ti
 
 - PostgreSQL JDBC driver;
 - Hadoop AWS/S3A connector for MinIO.
+
+The `--packages` part of the command is important. Without it, Spark cannot read MinIO paths such as `s3a://datalake/...`, and students may see this error:
+
+```text
+Class org.apache.hadoop.fs.s3a.S3AFileSystem not found
+```
+
+On the first run, Spark may download these jars from Maven. That is normal.
 
 The basic scenario-loading logic is:
 
@@ -284,7 +292,7 @@ Use this option when you want PySpark to load multiple scenario folders from Min
 For the normal lab run, students only run this command:
 
 ```cmd
-docker exec ti-batch-jupyter python /home/jovyan/work/pyspark-database/scripts/postgres.py
+docker exec ti-batch-jupyter spark-submit --packages "org.postgresql:postgresql:42.7.4,org.apache.hadoop:hadoop-aws:3.3.4" /home/jovyan/work/pyspark-database/scripts/postgres.py
 ```
 
 This loads all CSV scenario folders into PostgreSQL using the default settings.
@@ -292,13 +300,13 @@ This loads all CSV scenario folders into PostgreSQL using the default settings.
 If the instructor wants to load JSON instead of CSV:
 
 ```cmd
-docker exec ti-batch-jupyter python /home/jovyan/work/pyspark-database/scripts/postgres.py --source-format json
+docker exec ti-batch-jupyter spark-submit --packages "org.postgresql:postgresql:42.7.4,org.apache.hadoop:hadoop-aws:3.3.4" /home/jovyan/work/pyspark-database/scripts/postgres.py --source-format json
 ```
 
 If the instructor wants to load Parquet instead of CSV:
 
 ```cmd
-docker exec ti-batch-jupyter python /home/jovyan/work/pyspark-database/scripts/postgres.py --source-format parquet
+docker exec ti-batch-jupyter spark-submit --packages "org.postgresql:postgresql:42.7.4,org.apache.hadoop:hadoop-aws:3.3.4" /home/jovyan/work/pyspark-database/scripts/postgres.py --source-format parquet
 ```
 
 What this script does:
@@ -315,7 +323,7 @@ The default write mode is `overwrite`, which makes the lab easy to rerun. Some s
 If the instructor wants to load only selected scenarios, pass the scenario numbers:
 
 ```cmd
-docker exec ti-batch-jupyter python /home/jovyan/work/pyspark-database/scripts/postgres.py --scenarios 01,02,05
+docker exec ti-batch-jupyter spark-submit --packages "org.postgresql:postgresql:42.7.4,org.apache.hadoop:hadoop-aws:3.3.4" /home/jovyan/work/pyspark-database/scripts/postgres.py --scenarios 01,02,05
 ```
 
 ### Option B: Beginner example: load only Scenario 01 customer CSV files
