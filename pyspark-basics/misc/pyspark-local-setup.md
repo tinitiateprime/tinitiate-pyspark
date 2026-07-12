@@ -163,9 +163,9 @@ For the beginner labs, focus on these:
 
 | Service | Container | URL or port |
 |---|---|---|
-| PostgreSQL | `postgres` | `localhost:5432` |
-| MinIO | `minio` | API: `localhost:9000`, browser: `http://localhost:9001` |
-| Jupyter | `jupyter` | `http://localhost:8888` |
+| PostgreSQL | `ti-batch-postgres` | `localhost:5432` |
+| MinIO | `ti-batch-minio` | API: `localhost:9000`, browser: `http://localhost:9001` |
+| Jupyter | `ti-batch-jupyter` | `http://localhost:8888` |
 
 The Docker setup mounts this project folder into the Jupyter container at:
 
@@ -194,11 +194,11 @@ docker ps
 You should see containers such as:
 
 ```text
-postgres
-minio
-jupyter
-spark-master
-spark-worker
+ti-batch-postgres
+ti-batch-minio
+ti-batch-jupyter
+ti-batch-spark-master
+ti-batch-spark-worker
 ```
 
 ## STEP 4: Create PostgreSQL training tables
@@ -208,13 +208,13 @@ PostgreSQL is running now, but the lab tables are not created yet.
 Run this command to create the tables:
 
 ```cmd
-docker exec -e PGPASSWORD=tiuser!23456 postgres psql -v ON_ERROR_STOP=1 -U ti_dbuser -d tinitiateai -f /lab/sql/01_schema.sql
+docker exec -e PGPASSWORD=tiuser!23456 ti-batch-postgres psql -v ON_ERROR_STOP=1 -U ti_dbuser -d tinitiateai -f /docker-entrypoint-initdb.d/01_schema.sql
 ```
 
 Verify the training tables:
 
 ```cmd
-docker exec -e PGPASSWORD=tiuser!23456 postgres psql -U ti_dbuser -d tinitiateai -c "\dt training.*"
+docker exec -e PGPASSWORD=tiuser!23456 ti-batch-postgres psql -U ti_dbuser -d tinitiateai -c "\dt training.*"
 ```
 
 You should see tables such as:
@@ -302,7 +302,7 @@ docker ps
 Get the Jupyter URL:
 
 ```cmd
-docker logs jupyter
+docker logs ti-batch-jupyter
 ```
 
 Look for a URL like this:

@@ -3,7 +3,7 @@
 
 Default student run:
 
-    docker exec jupyter python /home/jovyan/work/pyspark-database/scripts/postgres.py
+    docker exec ti-batch-jupyter python /home/jovyan/work/pyspark-database/scripts/postgres.py
 
 No parameters are required for the normal lab. By default this script loads:
 
@@ -86,7 +86,7 @@ def default_minio_endpoint() -> str:
     if "MINIO_ENDPOINT" in os.environ:
         return os.environ["MINIO_ENDPOINT"]
     if running_inside_docker():
-        return "http://minio:9000"
+        return "http://ti-batch-minio:9000"
     return "http://localhost:9000"
 
 
@@ -94,7 +94,7 @@ def default_postgres_jdbc_url() -> str:
     if "POSTGRES_JDBC_URL" in os.environ:
         return os.environ["POSTGRES_JDBC_URL"]
     if running_inside_docker():
-        return "jdbc:postgresql://postgres:5432/tinitiateai"
+        return "jdbc:postgresql://ti-batch-postgres:5432/tinitiateai"
     return "jdbc:postgresql://localhost:5432/tinitiateai"
 
 
@@ -153,7 +153,7 @@ def stop_if_windows_python_without_hadoop() -> None:
     raise SystemExit(
         "This script starts PySpark. On Windows, local PySpark needs HADOOP_HOME/winutils.exe.\n\n"
         "For this lab, run the script inside Docker instead:\n\n"
-        "  docker exec jupyter python /home/jovyan/work/pyspark-database/scripts/postgres.py\n\n"
+        "  docker exec ti-batch-jupyter python /home/jovyan/work/pyspark-database/scripts/postgres.py\n\n"
         "Run that command from the project folder after Docker is started."
     )
 

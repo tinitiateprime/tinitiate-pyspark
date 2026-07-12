@@ -2,7 +2,7 @@ services:
 
   postgres:
     image: pgvector/pgvector:pg15
-    container_name: postgres
+    container_name: ti-batch-postgres
     environment:
       POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256 --auth-local=scram-sha-256
       POSTGRES_USER: ti_dbuser
@@ -13,10 +13,11 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./sql:/lab/sql:ro
+      - ./sql/01_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
 
   minio:
     image: minio/minio
-    container_name: minio
+    container_name: ti-batch-minio
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: minio
@@ -58,7 +59,7 @@ services:
 
   spark-master:
     image: bde2020/spark-master:latest
-    container_name: spark-master
+    container_name: ti-batch-spark-master
     environment:
       INIT_DAEMON_STEP: setup_spark
     ports:
@@ -67,7 +68,7 @@ services:
 
   spark-worker:
     image: bde2020/spark-worker:latest
-    container_name: spark-worker
+    container_name: ti-batch-spark-worker
     depends_on:
       - spark-master
     environment:
@@ -79,7 +80,7 @@ services:
 
   jupyter:
     image: jupyter/pyspark-notebook:latest
-    container_name: jupyter
+    container_name: ti-batch-jupyter
     depends_on:
       - spark-master
     ports:
@@ -92,7 +93,7 @@ services:
 
   airflow-init:
     image: apache/airflow:2.8.1
-    container_name: airflow-init
+    container_name: ti-batch-airflow-init
     depends_on:
       - postgres
     environment:
@@ -103,7 +104,7 @@ services:
 
   airflow-webserver:
     image: apache/airflow:2.8.1
-    container_name: airflow-webserver
+    container_name: ti-batch-airflow-webserver
     depends_on:
       - airflow-init
     environment:
@@ -115,7 +116,7 @@ services:
 
   airflow-scheduler:
     image: apache/airflow:2.8.1
-    container_name: airflow-scheduler
+    container_name: ti-batch-airflow-scheduler
     depends_on:
       - airflow-webserver
     environment:

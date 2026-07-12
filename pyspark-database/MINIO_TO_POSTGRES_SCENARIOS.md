@@ -156,10 +156,10 @@ Students do not need to pass any parameters for the normal lab run.
 Run this command from the project folder:
 
 ```cmd
-docker exec jupyter python /home/jovyan/work/pyspark-database/scripts/postgres.py
+docker exec ti-batch-jupyter python /home/jovyan/work/pyspark-database/scripts/postgres.py
 ```
 
-Important: this command runs PySpark inside the Docker `jupyter` container. This avoids the Windows `HADOOP_HOME` / `winutils.exe` error that can happen when PySpark is run directly with Windows Python.
+Important: this command runs PySpark inside the Docker `ti-batch-jupyter` container. This avoids the Windows `HADOOP_HOME` / `winutils.exe` error that can happen when PySpark is run directly with Windows Python.
 
 The script file is here:
 
@@ -175,11 +175,11 @@ The main student script is:
 
 This script is simple for students because the default values are already inside the script:
 
-- MinIO endpoint inside Docker: `http://minio:9000`
+- MinIO endpoint inside Docker: `http://ti-batch-minio:9000`
 - MinIO bucket: `datalake`
 - MinIO access key: `minio`
 - MinIO secret key: `minio123`
-- PostgreSQL JDBC URL inside Docker: `jdbc:postgresql://postgres:5432/tinitiateai`
+- PostgreSQL JDBC URL inside Docker: `jdbc:postgresql://ti-batch-postgres:5432/tinitiateai`
 - PostgreSQL user: `ti_dbuser`
 - PostgreSQL password: `tiuser!23456`
 - PostgreSQL schema: `training`
@@ -217,14 +217,14 @@ SCENARIOS = {
 source_format = "csv"
 bucket = "datalake"
 
-postgres_url = "jdbc:postgresql://localhost:5432/tinitiateai"
+postgres_url = "jdbc:postgresql://ti-batch-postgres:5432/tinitiateai"
 postgres_user = "ti_dbuser"
 postgres_password = "tiuser!23456"
 
 spark = (
     SparkSession.builder
     .appName("load-minio-scenarios-to-postgres")
-    .config("spark.hadoop.fs.s3a.endpoint", "http://localhost:9000")
+    .config("spark.hadoop.fs.s3a.endpoint", "http://ti-batch-minio:9000")
     .config("spark.hadoop.fs.s3a.access.key", "minio")
     .config("spark.hadoop.fs.s3a.secret.key", "minio123")
     .config("spark.hadoop.fs.s3a.path.style.access", "true")
@@ -284,7 +284,7 @@ Use this option when you want PySpark to load multiple scenario folders from Min
 For the normal lab run, students only run this command:
 
 ```cmd
-docker exec jupyter python /home/jovyan/work/pyspark-database/scripts/postgres.py
+docker exec ti-batch-jupyter python /home/jovyan/work/pyspark-database/scripts/postgres.py
 ```
 
 This loads all CSV scenario folders into PostgreSQL using the default settings.
@@ -292,13 +292,13 @@ This loads all CSV scenario folders into PostgreSQL using the default settings.
 If the instructor wants to load JSON instead of CSV:
 
 ```cmd
-docker exec jupyter python /home/jovyan/work/pyspark-database/scripts/postgres.py --source-format json
+docker exec ti-batch-jupyter python /home/jovyan/work/pyspark-database/scripts/postgres.py --source-format json
 ```
 
 If the instructor wants to load Parquet instead of CSV:
 
 ```cmd
-docker exec jupyter python /home/jovyan/work/pyspark-database/scripts/postgres.py --source-format parquet
+docker exec ti-batch-jupyter python /home/jovyan/work/pyspark-database/scripts/postgres.py --source-format parquet
 ```
 
 What this script does:
@@ -315,7 +315,7 @@ The default write mode is `overwrite`, which makes the lab easy to rerun. Some s
 If the instructor wants to load only selected scenarios, pass the scenario numbers:
 
 ```cmd
-docker exec jupyter python /home/jovyan/work/pyspark-database/scripts/postgres.py --scenarios 01,02,05
+docker exec ti-batch-jupyter python /home/jovyan/work/pyspark-database/scripts/postgres.py --scenarios 01,02,05
 ```
 
 ### Option B: Beginner example: load only Scenario 01 customer CSV files
@@ -383,7 +383,7 @@ SELECT COUNT(*) FROM training.customer;
 Or run the same check from Command Prompt:
 
 ```cmd
-docker exec -e PGPASSWORD=tiuser!23456 postgres psql -U ti_dbuser -d tinitiateai -c "SELECT COUNT(*) FROM training.customer;"
+docker exec -e PGPASSWORD=tiuser!23456 ti-batch-postgres psql -U ti_dbuser -d tinitiateai -c "SELECT COUNT(*) FROM training.customer;"
 ```
 
 Expected count:
@@ -406,7 +406,7 @@ LIMIT 5;
 Or run it from Command Prompt:
 
 ```cmd
-docker exec -e PGPASSWORD=tiuser!23456 postgres psql -U ti_dbuser -d tinitiateai -c "SELECT scenario, target_table, source_format, source_path, accepted_rows, rejected_rows FROM training.load_audit ORDER BY load_id DESC LIMIT 5;"
+docker exec -e PGPASSWORD=tiuser!23456 ti-batch-postgres psql -U ti_dbuser -d tinitiateai -c "SELECT scenario, target_table, source_format, source_path, accepted_rows, rejected_rows FROM training.load_audit ORDER BY load_id DESC LIMIT 5;"
 ```
 
 The `source_path` should begin with:
@@ -471,19 +471,19 @@ parquet
 Show PostgreSQL tables:
 
 ```cmd
-docker exec -e PGPASSWORD=tiuser!23456 postgres psql -U ti_dbuser -d tinitiateai -c "\dt training.*"
+docker exec -e PGPASSWORD=tiuser!23456 ti-batch-postgres psql -U ti_dbuser -d tinitiateai -c "\dt training.*"
 ```
 
 Show recent loads:
 
 ```cmd
-docker exec -e PGPASSWORD=tiuser!23456 postgres psql -U ti_dbuser -d tinitiateai -c "SELECT target_table, scenario, source_format, source_path, accepted_rows, rejected_rows FROM training.load_audit ORDER BY load_id DESC LIMIT 10;"
+docker exec -e PGPASSWORD=tiuser!23456 ti-batch-postgres psql -U ti_dbuser -d tinitiateai -c "SELECT target_table, scenario, source_format, source_path, accepted_rows, rejected_rows FROM training.load_audit ORDER BY load_id DESC LIMIT 10;"
 ```
 
 Show row count for one table:
 
 ```cmd
-docker exec -e PGPASSWORD=tiuser!23456 postgres psql -U ti_dbuser -d tinitiateai -c "SELECT COUNT(*) FROM training.customer;"
+docker exec -e PGPASSWORD=tiuser!23456 ti-batch-postgres psql -U ti_dbuser -d tinitiateai -c "SELECT COUNT(*) FROM training.customer;"
 ```
 
 ## If you need to republish
