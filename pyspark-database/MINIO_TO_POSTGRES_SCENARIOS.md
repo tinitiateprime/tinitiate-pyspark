@@ -173,6 +173,83 @@ These values tell PySpark:
 - where MinIO is running;
 - which extra Spark packages are needed to read from MinIO and write to PostgreSQL.
 
+### Python code used to load MinIO files into PostgreSQL
+
+The full reusable scripts are:
+
+- [`pyspark-database/scripts/load_files_to_postgres.py`](scripts/load_files_to_postgres.py), for loading one MinIO folder into one PostgreSQL table;
+- [`pyspark-database/scripts/load_minio_scenarios_to_postgres.py`](scripts/load_minio_scenarios_to_postgres.py), for loading multiple scenario folders.
+
+The basic PySpark logic is:
+
+```python
+from pyspark.sql import SparkSession
+
+minio_endpoint = "http://localhost:9000"
+minio_access_key = "minio"
+minio_secret_key = "minio123"
+
+postgres_url = "jdbc:postgresql://localhost:5432/tinitiateai"
+postgres_user = "ti_dbuser"
+postgres_password = "tiuser!23456"
+
+source_path = "s3a://datalake/01_many_small_json_customer/01_json_small_customer/csv/customer"
+target_table = "training.customer"
+
+spark = (
+    SparkSession.builder
+    .appName("minio-to-postgres-example")
+    .config("spark.hadoop.fs.s3a.endpoint", minio_endpoint)
+    .config("spark.hadoop.fs.s3a.access.key", minio_access_key)
+    .config("spark.hadoop.fs.s3a.secret.key", minio_secret_key)
+    .config("spark.hadoop.fs.s3a.path.style.access", "true")
+    .config("spark.hadoop.fs.s3a.connection.ssl.enabled", "false")
+    .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
+    .getOrCreate()
+)
+
+df = (
+    spark.read
+    .option("header", True)
+    .option("inferSchema", True)
+    .csv(source_path)
+)
+
+(
+    df.write
+    .format("jdbc")
+    .option("url", postgres_url)
+    .option("dbtable", target_table)
+    .option("user", postgres_user)
+    .option("password", postgres_password)
+    .option("driver", "org.postgresql.Driver")
+    .option("truncate", "true")
+    .mode("overwrite")
+    .save()
+)
+
+spark.stop()
+```
+
+For JSON, change the read line to:
+
+```python
+df = spark.read.json(source_path)
+```
+
+For Parquet, change the read line to:
+
+```python
+df = spark.read.parquet(source_path)
+```
+
+The scripts in this repository add extra logic on top of this basic pattern:
+
+- table-specific column casting;
+- rejected-record handling;
+- audit logging into `training.load_audit`;
+- loading many scenario folders automatically.
+
 ### Option A: Load all MinIO scenario folders for one format
 
 Use this option when you want PySpark to load multiple scenario folders from MinIO into PostgreSQL.
