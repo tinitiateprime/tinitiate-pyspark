@@ -39,7 +39,15 @@ This folder is called the repository root. All commands in this guide should be 
 
 ## Source files for the lab
 
-The recommended approach is to download the prepared ZIP files from GitHub and extract them into the project folder.
+The recommended approach is to download the prepared data ZIP files from GitHub and extract them into:
+
+```text
+data/database_scenarios
+```
+
+For the full download and extraction instructions, use:
+
+[`DOWNLOAD_AND_EXTRACT_PROJECT.md`](DOWNLOAD_AND_EXTRACT_PROJECT.md)
 
 If students want to generate the source files locally instead of using the GitHub files, use this optional guide:
 

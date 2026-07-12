@@ -1,24 +1,25 @@
-# Download and Extract the Lab Project
+# Download and Extract the Lab Files
 
 Use this page before starting the MinIO to PostgreSQL lab.
 
-Students need the lab project files on their computer before running Docker, Python, MinIO, or PySpark commands.
+Students need two things on their computer:
 
-## Option 1: Download the ZIP from GitHub
+1. this PySpark repository, which has the scripts and markdown guides;
+2. the prepared data ZIP, which has the source files to upload into MinIO.
 
-Go to this GitHub page:
+## 1. Download this PySpark repository
 
-<https://github.com/tinitiateprime/data-appliance/blob/main/README.md>
+Download or clone this repository:
 
-Download the ZIP file provided there.
+<https://github.com/tinitiateprime/tinitiate-pyspark>
 
-After downloading, extract the ZIP file into:
+Extract the repository into:
 
 ```text
 C:\tinitiate_pyspark
 ```
 
-After extraction, the folder should look like this:
+After extraction, the project folder should look like this:
 
 ```text
 C:\
@@ -31,35 +32,56 @@ C:\
       sql
 ```
 
-## Option 2: Use a ZIP file shared by the instructor
+Important: do not keep the files inside an extra nested folder like this:
 
-If the instructor gives the ZIP file directly, download it first.
+```text
+C:\tinitiate_pyspark\tinitiate-pyspark
+```
 
-Then extract it into:
+If that happens, move the inner files up one level so `README.md` and `pyspark-database` are directly inside:
 
 ```text
 C:\tinitiate_pyspark
 ```
 
-Important: make sure the final project folder is:
+## 2. Download the prepared data files
+
+Go to the data appliance README:
+
+<https://github.com/tinitiateprime/data-appliance/blob/main/README.md>
+
+Download the prepared ZIP file provided there.
+
+That ZIP is for data files. It may not contain markdown files such as `MINIO_TO_POSTGRES_SCENARIOS.md`.
+
+Extract or copy the prepared data into this folder inside the PySpark project:
 
 ```text
-C:\tinitiate_pyspark
+C:\tinitiate_pyspark\data\database_scenarios
 ```
 
-Do not keep the files inside an extra nested folder like this:
+After extracting the data, the folder should look like this:
 
 ```text
-C:\tinitiate_pyspark\tinitiate_pyspark
+C:\
+  tinitiate_pyspark
+    data
+      database_scenarios
+        DDL
+          ddl.sql
+        01_many_small_json_customer
+        02_many_small_json_multiple_tables
+        03_many_large_json_sales
+        04_many_small_csv_emp
+        05_many_small_csv_multiple_tables
+        06_many_large_csv_emp
+        07_many_small_parquet_transaction
+        08_many_small_parquet_multiple_tables
+        09_many_large_parquet_sales
+        10_ultra_one_million_files
 ```
 
-If that happens, move the inner files up one level so the project files are directly inside:
-
-```text
-C:\tinitiate_pyspark
-```
-
-## Verify the project folder
+## 3. Verify the folders
 
 Open Command Prompt and run:
 
@@ -68,14 +90,28 @@ cd C:\tinitiate_pyspark
 dir
 ```
 
-You should see folders/files such as:
+You should see:
 
 ```text
 README.md
 pyspark-database
+data
 ```
 
-If you can see `pyspark-database`, the project files are in the correct location.
+Then check the prepared data folder:
+
+```cmd
+dir data\database_scenarios
+```
+
+You should see scenario folders such as:
+
+```text
+01_many_small_json_customer
+02_many_small_json_multiple_tables
+...
+10_ultra_one_million_files
+```
 
 Now return to the main lab guide:
 
