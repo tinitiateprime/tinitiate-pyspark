@@ -129,9 +129,13 @@ Now Click on PostgresSQL
  
  Enter 
       1. Host: localhost
+
       2. Port: 5432
+
       3. Database: tinitiateai
+
       4. Username: ti_dbuser
+
       5. Password: tiuser!23456
 ```
 
