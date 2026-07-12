@@ -162,16 +162,13 @@ set MINIO_ENDPOINT=http://localhost:9000
 set MINIO_ACCESS_KEY=minio
 set MINIO_SECRET_KEY=minio123
 set MINIO_BUCKET=datalake
-
-set PACKAGES=org.postgresql:postgresql:42.7.4,org.apache.hadoop:hadoop-aws:3.3.4
 ```
 
 These values tell PySpark:
 
 - where PostgreSQL is running;
 - which PostgreSQL user and password to use;
-- where MinIO is running;
-- which extra Spark packages are needed to read from MinIO and write to PostgreSQL.
+- where MinIO is running.
 
 ### Python script used to load scenario folders
 
@@ -189,6 +186,11 @@ Students do not need to pass parameters for the normal lab run. By default, the 
 - write mode: `overwrite`;
 - MinIO bucket: `datalake`;
 - PostgreSQL database: `tinitiateai`.
+
+The script also adds the required Spark packages automatically:
+
+- PostgreSQL JDBC driver;
+- Hadoop AWS/S3A connector for MinIO.
 
 Do not run [`load_files_to_postgres.py`](scripts/load_files_to_postgres.py) by itself without arguments. It is a single-folder loader, so it must be given:
 
@@ -291,8 +293,7 @@ Use this option when you want PySpark to load multiple scenario folders from Min
 For the normal lab run, students only run this command:
 
 ```cmd
-spark-submit --packages %PACKAGES% ^
-  pyspark-database/scripts/load_minio_scenarios_to_postgres.py
+C:\Python311\python.exe pyspark-database/scripts/load_minio_scenarios_to_postgres.py
 ```
 
 This loads all CSV scenario folders into PostgreSQL using the default settings.
@@ -300,17 +301,13 @@ This loads all CSV scenario folders into PostgreSQL using the default settings.
 If the instructor wants to load JSON instead of CSV:
 
 ```cmd
-spark-submit --packages %PACKAGES% ^
-  pyspark-database/scripts/load_minio_scenarios_to_postgres.py ^
-  --source-format json
+C:\Python311\python.exe pyspark-database/scripts/load_minio_scenarios_to_postgres.py --source-format json
 ```
 
 If the instructor wants to load Parquet instead of CSV:
 
 ```cmd
-spark-submit --packages %PACKAGES% ^
-  pyspark-database/scripts/load_minio_scenarios_to_postgres.py ^
-  --source-format parquet
+C:\Python311\python.exe pyspark-database/scripts/load_minio_scenarios_to_postgres.py --source-format parquet
 ```
 
 What this script does:
@@ -328,11 +325,7 @@ The default write mode is `overwrite`, which makes the lab easy to rerun. Some s
 If the instructor wants to load only selected scenarios, pass the scenario numbers:
 
 ```cmd
-spark-submit --packages %PACKAGES% ^
-  pyspark-database/scripts/load_minio_scenarios_to_postgres.py ^
-  --source-format csv ^
-  --scenarios 01,02,05 ^
-  --write-mode overwrite
+C:\Python311\python.exe pyspark-database/scripts/load_minio_scenarios_to_postgres.py --scenarios 01,02,05
 ```
 
 ### Option B: Beginner example: load only Scenario 01 customer CSV files

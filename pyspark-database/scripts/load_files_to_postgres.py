@@ -107,7 +107,7 @@ Examples:
 
   For the normal student lab, load multiple scenario folders without parameters:
 
-    spark-submit --packages %PACKAGES% pyspark-database/scripts/load_minio_scenarios_to_postgres.py
+    C:\\Python311\\python.exe pyspark-database/scripts/load_minio_scenarios_to_postgres.py
 """,
     )
     parser.add_argument("--source-path", required=True)
