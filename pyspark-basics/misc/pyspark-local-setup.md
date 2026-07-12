@@ -207,29 +207,7 @@ pyspark-database
 pyspark-datalake
 ```
 
-## STEP 9: PostgreSQL access
-
-PostgreSQL runs in Docker.
-
-Connection details:
-
-```text
-Host: localhost
-Port: 5432
-Database: tinitiateai
-User: ti_dbuser
-Password: tiuser!23456
-```
-
-You can connect using DBeaver or from Docker commands.
-
-Example:
-
-```cmd
-docker exec -e PGPASSWORD=tiuser!23456 postgres psql -U ti_dbuser -d tinitiateai -c "\dt"
-```
-
-## STEP 10: MinIO access
+## STEP 09: MinIO access
 
 Open MinIO in the browser:
 
@@ -250,7 +228,7 @@ The lab bucket is:
 datalake
 ```
 
-## STEP 11: PySpark to PostgreSQL lab
+## STEP 10: PySpark to PostgreSQL lab
 
 After Docker, PostgreSQL, MinIO, and Jupyter are running, continue here:
 
