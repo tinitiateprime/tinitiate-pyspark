@@ -90,7 +90,26 @@ NULLABLE_COLUMNS = {"customer": {"email", "location_id"}, "emp": {"mgr", "commis
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+
+  Load one CSV MinIO folder into PostgreSQL table training.customer:
+
+    spark-submit --packages %PACKAGES% pyspark-database/scripts/load_files_to_postgres.py ^
+      --source-path s3a://datalake/01_many_small_json_customer/01_json_small_customer/csv/customer ^
+      --source-format csv ^
+      --target-table customer ^
+      --scenario scenario-01-customer-csv ^
+      --write-mode overwrite
+
+  For the normal student lab, load multiple scenario folders without parameters:
+
+    spark-submit --packages %PACKAGES% pyspark-database/scripts/load_minio_scenarios_to_postgres.py
+""",
+    )
     parser.add_argument("--source-path", required=True)
     parser.add_argument("--source-format", choices=["csv", "json", "parquet"], required=True)
     parser.add_argument("--target-table", choices=sorted(TABLE_TYPES), required=True)

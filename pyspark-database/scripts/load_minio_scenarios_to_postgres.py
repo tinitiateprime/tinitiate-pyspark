@@ -73,7 +73,27 @@ SCENARIO_LOADS = {
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Default student command:
+
+  spark-submit --packages %PACKAGES% pyspark-database/scripts/load_minio_scenarios_to_postgres.py
+
+The default command loads CSV files from all scenarios into PostgreSQL with overwrite mode.
+
+Optional instructor examples:
+
+  Load JSON instead:
+
+    spark-submit --packages %PACKAGES% pyspark-database/scripts/load_minio_scenarios_to_postgres.py --source-format json
+
+  Load selected scenarios only:
+
+    spark-submit --packages %PACKAGES% pyspark-database/scripts/load_minio_scenarios_to_postgres.py --scenarios 01,02,05
+""",
+    )
     parser.add_argument(
         "--source-format",
         choices=["csv", "json", "parquet"],
