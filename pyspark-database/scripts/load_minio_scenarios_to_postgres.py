@@ -18,6 +18,9 @@ if str(SCRIPT_DIR) not in sys.path:
 import load_files_to_postgres as loader  # noqa: E402
 
 
+DEFAULT_SPARK_PACKAGES = "org.postgresql:postgresql:42.7.4,org.apache.hadoop:hadoop-aws:3.3.4"
+
+
 SCENARIO_LOADS = {
     "01": {
         "name": "01_many_small_json_customer",
@@ -79,7 +82,7 @@ def parse_args() -> argparse.Namespace:
         epilog="""
 Default student command:
 
-  spark-submit --packages %PACKAGES% pyspark-database/scripts/load_minio_scenarios_to_postgres.py
+  C:\\Python311\\python.exe pyspark-database/scripts/load_minio_scenarios_to_postgres.py
 
 The default command loads CSV files from all scenarios into PostgreSQL with overwrite mode.
 
@@ -87,11 +90,11 @@ Optional instructor examples:
 
   Load JSON instead:
 
-    spark-submit --packages %PACKAGES% pyspark-database/scripts/load_minio_scenarios_to_postgres.py --source-format json
+    C:\\Python311\\python.exe pyspark-database/scripts/load_minio_scenarios_to_postgres.py --source-format json
 
   Load selected scenarios only:
 
-    spark-submit --packages %PACKAGES% pyspark-database/scripts/load_minio_scenarios_to_postgres.py --scenarios 01,02,05
+    C:\\Python311\\python.exe pyspark-database/scripts/load_minio_scenarios_to_postgres.py --scenarios 01,02,05
 """,
     )
     parser.add_argument(
@@ -119,6 +122,7 @@ Optional instructor examples:
     parser.add_argument("--minio-access-key", default=os.environ.get("MINIO_ACCESS_KEY", "minio"))
     parser.add_argument("--minio-secret-key", default=os.environ.get("MINIO_SECRET_KEY", "minio123"))
     parser.add_argument("--reject-path", default="data/database_rejects")
+    parser.add_argument("--spark-packages", default=os.environ.get("SPARK_PACKAGES", DEFAULT_SPARK_PACKAGES))
     return parser.parse_args()
 
 
@@ -147,6 +151,7 @@ def build_spark(args: argparse.Namespace) -> SparkSession:
     return (
         SparkSession.builder
         .appName(f"load-minio-scenarios-{args.source_format}")
+        .config("spark.jars.packages", args.spark_packages)
         .config("spark.hadoop.fs.s3a.endpoint", args.minio_endpoint)
         .config("spark.hadoop.fs.s3a.access.key", args.minio_access_key)
         .config("spark.hadoop.fs.s3a.secret.key", args.minio_secret_key)
