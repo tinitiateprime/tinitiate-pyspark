@@ -173,82 +173,101 @@ These values tell PySpark:
 - where MinIO is running;
 - which extra Spark packages are needed to read from MinIO and write to PostgreSQL.
 
-### Python code used to load MinIO files into PostgreSQL
+### Python script used to load scenario folders
 
 The full reusable scripts are:
 
 - [`pyspark-database/scripts/load_files_to_postgres.py`](scripts/load_files_to_postgres.py), for loading one MinIO folder into one PostgreSQL table;
 - [`pyspark-database/scripts/load_minio_scenarios_to_postgres.py`](scripts/load_minio_scenarios_to_postgres.py), for loading multiple scenario folders.
 
-The basic PySpark logic is:
+Use [`load_minio_scenarios_to_postgres.py`](scripts/load_minio_scenarios_to_postgres.py) when students want to load many scenario folders from MinIO into PostgreSQL.
+
+The basic scenario-loading logic is:
 
 ```python
 from pyspark.sql import SparkSession
 
-minio_endpoint = "http://localhost:9000"
-minio_access_key = "minio"
-minio_secret_key = "minio123"
+SCENARIOS = {
+    "01": {
+        "folder": "01_many_small_json_customer",
+        "dataset": "01_json_small_customer",
+        "tables": ["customer"],
+    },
+    "02": {
+        "folder": "02_many_small_json_multiple_tables",
+        "dataset": "02_json_small_multi",
+        "tables": ["location", "product", "customer", "sales"],
+    },
+    "05": {
+        "folder": "05_many_small_csv_multiple_tables",
+        "dataset": "05_csv_small_multi",
+        "tables": ["dept", "projects", "emp", "emp_projects"],
+    },
+}
+
+source_format = "csv"
+bucket = "datalake"
 
 postgres_url = "jdbc:postgresql://localhost:5432/tinitiateai"
 postgres_user = "ti_dbuser"
 postgres_password = "tiuser!23456"
 
-source_path = "s3a://datalake/01_many_small_json_customer/01_json_small_customer/csv/customer"
-target_table = "training.customer"
-
 spark = (
     SparkSession.builder
-    .appName("minio-to-postgres-example")
-    .config("spark.hadoop.fs.s3a.endpoint", minio_endpoint)
-    .config("spark.hadoop.fs.s3a.access.key", minio_access_key)
-    .config("spark.hadoop.fs.s3a.secret.key", minio_secret_key)
+    .appName("load-minio-scenarios-to-postgres")
+    .config("spark.hadoop.fs.s3a.endpoint", "http://localhost:9000")
+    .config("spark.hadoop.fs.s3a.access.key", "minio")
+    .config("spark.hadoop.fs.s3a.secret.key", "minio123")
     .config("spark.hadoop.fs.s3a.path.style.access", "true")
     .config("spark.hadoop.fs.s3a.connection.ssl.enabled", "false")
     .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
     .getOrCreate()
 )
 
-df = (
-    spark.read
-    .option("header", True)
-    .option("inferSchema", True)
-    .csv(source_path)
-)
+for scenario_no, scenario in SCENARIOS.items():
+    for table in scenario["tables"]:
+        source_path = (
+            f"s3a://{bucket}/"
+            f"{scenario['folder']}/"
+            f"{scenario['dataset']}/"
+            f"{source_format}/"
+            f"{table}"
+        )
 
-(
-    df.write
-    .format("jdbc")
-    .option("url", postgres_url)
-    .option("dbtable", target_table)
-    .option("user", postgres_user)
-    .option("password", postgres_password)
-    .option("driver", "org.postgresql.Driver")
-    .option("truncate", "true")
-    .mode("overwrite")
-    .save()
-)
+        if source_format == "csv":
+            df = spark.read.option("header", True).option("inferSchema", True).csv(source_path)
+        elif source_format == "json":
+            df = spark.read.json(source_path)
+        else:
+            df = spark.read.parquet(source_path)
+
+        (
+            df.write
+            .format("jdbc")
+            .option("url", postgres_url)
+            .option("dbtable", f"training.{table}")
+            .option("user", postgres_user)
+            .option("password", postgres_password)
+            .option("driver", "org.postgresql.Driver")
+            .option("truncate", "true")
+            .mode("overwrite")
+            .save()
+        )
+
+        print(f"Loaded {source_path} into training.{table}")
 
 spark.stop()
 ```
 
-For JSON, change the read line to:
+The actual repository script has more features than the basic example above:
 
-```python
-df = spark.read.json(source_path)
-```
+- supports all scenarios 01-10;
+- accepts `--source-format csv`, `json`, or `parquet`;
+- accepts `--scenarios all` or selected scenarios like `01,02,05`;
+- uses table-specific column casting from [`load_files_to_postgres.py`](scripts/load_files_to_postgres.py);
+- writes rejected records and audit records.
 
-For Parquet, change the read line to:
-
-```python
-df = spark.read.parquet(source_path)
-```
-
-The scripts in this repository add extra logic on top of this basic pattern:
-
-- table-specific column casting;
-- rejected-record handling;
-- audit logging into `training.load_audit`;
-- loading many scenario folders automatically.
+The commands to execute the full script are shown in Option A below.
 
 ### Option A: Load all MinIO scenario folders for one format
 
