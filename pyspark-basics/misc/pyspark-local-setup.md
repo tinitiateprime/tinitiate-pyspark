@@ -128,16 +128,16 @@ Now Click on PostgresSQL
 ![alt text](image-2.png)
 
 ``` 
- Enter 
-      1. Host: localhost
+ Use these connection details:
 
-      2. Port: 5432
+ 
+Database type: PostgreSQL
+Host: localhost
+Port: 5432
+Database: tinitiateai
+Username: ti_dbuser
+Password: tiuser!23456
 
-      3. Database: tinitiateai
-
-      4. Username: ti_dbuser
-
-      5. Password: tiuser!23456
 ```
  
 ![alt text](image-3.png)
@@ -145,16 +145,8 @@ Now Click on PostgresSQL
  
 
 
-Use these connection details:
 
-```text
-Database type: PostgreSQL
-Host: localhost
-Port: 5432
-Database: tinitiateai
-Username: ti_dbuser
-Password: tiuser!23456
-```
+ 
 
 When DBeaver asks to download the PostgreSQL driver, click `Download`.
 
