@@ -3,7 +3,7 @@
 
 Default student run:
 
-    C:\Python311\python.exe pyspark-database/scripts/postgres.py
+    docker exec jupyter python /home/jovyan/work/pyspark-database/scripts/postgres.py
 
 No parameters are required for the normal lab. By default this script loads:
 
@@ -78,6 +78,26 @@ SCENARIOS = {
 }
 
 
+def running_inside_docker() -> bool:
+    return os.path.exists("/.dockerenv")
+
+
+def default_minio_endpoint() -> str:
+    if "MINIO_ENDPOINT" in os.environ:
+        return os.environ["MINIO_ENDPOINT"]
+    if running_inside_docker():
+        return "http://minio:9000"
+    return "http://localhost:9000"
+
+
+def default_postgres_jdbc_url() -> str:
+    if "POSTGRES_JDBC_URL" in os.environ:
+        return os.environ["POSTGRES_JDBC_URL"]
+    if running_inside_docker():
+        return "jdbc:postgresql://postgres:5432/tinitiateai"
+    return "jdbc:postgresql://localhost:5432/tinitiateai"
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=__doc__,
@@ -86,12 +106,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--source-format", choices=["csv", "json", "parquet"], default="csv")
     parser.add_argument("--scenarios", default="all")
     parser.add_argument("--bucket", default=os.environ.get("MINIO_BUCKET", "datalake"))
-    parser.add_argument("--minio-endpoint", default=os.environ.get("MINIO_ENDPOINT", "http://localhost:9000"))
+    parser.add_argument("--minio-endpoint", default=default_minio_endpoint())
     parser.add_argument("--minio-access-key", default=os.environ.get("MINIO_ACCESS_KEY", "minio"))
     parser.add_argument("--minio-secret-key", default=os.environ.get("MINIO_SECRET_KEY", "minio123"))
     parser.add_argument(
         "--jdbc-url",
-        default=os.environ.get("POSTGRES_JDBC_URL", "jdbc:postgresql://localhost:5432/tinitiateai"),
+        default=default_postgres_jdbc_url(),
     )
     parser.add_argument("--db-user", default=os.environ.get("POSTGRES_USER", "ti_dbuser"))
     parser.add_argument("--db-password", default=os.environ.get("POSTGRES_PASSWORD", "tiuser!23456"))
@@ -121,6 +141,20 @@ def build_spark(args: argparse.Namespace) -> SparkSession:
         .config("spark.hadoop.fs.s3a.connection.ssl.enabled", str(args.minio_endpoint.startswith("https")).lower())
         .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
         .getOrCreate()
+    )
+
+
+def stop_if_windows_python_without_hadoop() -> None:
+    if os.name != "nt":
+        return
+    if os.environ.get("HADOOP_HOME") or os.environ.get("hadoop.home.dir"):
+        return
+
+    raise SystemExit(
+        "This script starts PySpark. On Windows, local PySpark needs HADOOP_HOME/winutils.exe.\n\n"
+        "For this lab, run the script inside Docker instead:\n\n"
+        "  docker exec jupyter python /home/jovyan/work/pyspark-database/scripts/postgres.py\n\n"
+        "Run that command from the project folder after Docker is started."
     )
 
 
@@ -160,6 +194,7 @@ def write_to_postgres(frame, args: argparse.Namespace, table: str) -> None:
 def main() -> None:
     args = parse_args()
     scenario_numbers = selected_scenarios(args.scenarios)
+    stop_if_windows_python_without_hadoop()
     spark = build_spark(args)
     spark.sparkContext.setLogLevel("WARN")
 

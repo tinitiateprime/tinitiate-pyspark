@@ -165,6 +165,24 @@ For the beginner labs, focus on these:
 | MinIO | `minio` | API: `localhost:9000`, browser: `http://localhost:9001` |
 | Jupyter | `jupyter` | `http://localhost:8888` |
 
+The Docker setup mounts this project folder into the Jupyter container at:
+
+```text
+/home/jovyan/work
+```
+
+So this Windows project file:
+
+```text
+C:\tinitiate_pyspark\pyspark-database\scripts\postgres.py
+```
+
+is available inside Docker as:
+
+```text
+/home/jovyan/work/pyspark-database/scripts/postgres.py
+```
+
 Check containers:
 
 ```cmd

@@ -156,14 +156,16 @@ Students do not need to pass any parameters for the normal lab run.
 Run this command from the project folder:
 
 ```cmd
-C:\Python311\python.exe pyspark-database/scripts/postgres.py
+docker exec jupyter python /home/jovyan/work/pyspark-database/scripts/postgres.py
 ```
 
-Important: run the file from this project location:
+Important: this command runs PySpark inside the Docker `jupyter` container. This avoids the Windows `HADOOP_HOME` / `winutils.exe` error that can happen when PySpark is run directly with Windows Python.
+
+The script file is here:
 
 [`pyspark-database/scripts/postgres.py`](scripts/postgres.py)
 
-Do not run an old copied file from `Downloads`. If a student copied an older `postgres.py` into `Downloads`, it may fail because it cannot find the other project files.
+Do not run an old copied file from `Downloads`. Students should run the project script through Docker using the command above.
 
 ### Python script used to load scenario folders
 
@@ -173,11 +175,11 @@ The main student script is:
 
 This script is simple for students because the default values are already inside the script:
 
-- MinIO endpoint: `http://localhost:9000`
+- MinIO endpoint inside Docker: `http://minio:9000`
 - MinIO bucket: `datalake`
 - MinIO access key: `minio`
 - MinIO secret key: `minio123`
-- PostgreSQL database: `tinitiateai`
+- PostgreSQL JDBC URL inside Docker: `jdbc:postgresql://postgres:5432/tinitiateai`
 - PostgreSQL user: `ti_dbuser`
 - PostgreSQL password: `tiuser!23456`
 - PostgreSQL schema: `training`
@@ -282,7 +284,7 @@ Use this option when you want PySpark to load multiple scenario folders from Min
 For the normal lab run, students only run this command:
 
 ```cmd
-C:\Python311\python.exe pyspark-database/scripts/postgres.py
+docker exec jupyter python /home/jovyan/work/pyspark-database/scripts/postgres.py
 ```
 
 This loads all CSV scenario folders into PostgreSQL using the default settings.
@@ -290,13 +292,13 @@ This loads all CSV scenario folders into PostgreSQL using the default settings.
 If the instructor wants to load JSON instead of CSV:
 
 ```cmd
-C:\Python311\python.exe pyspark-database/scripts/postgres.py --source-format json
+docker exec jupyter python /home/jovyan/work/pyspark-database/scripts/postgres.py --source-format json
 ```
 
 If the instructor wants to load Parquet instead of CSV:
 
 ```cmd
-C:\Python311\python.exe pyspark-database/scripts/postgres.py --source-format parquet
+docker exec jupyter python /home/jovyan/work/pyspark-database/scripts/postgres.py --source-format parquet
 ```
 
 What this script does:
@@ -313,7 +315,7 @@ The default write mode is `overwrite`, which makes the lab easy to rerun. Some s
 If the instructor wants to load only selected scenarios, pass the scenario numbers:
 
 ```cmd
-C:\Python311\python.exe pyspark-database/scripts/postgres.py --scenarios 01,02,05
+docker exec jupyter python /home/jovyan/work/pyspark-database/scripts/postgres.py --scenarios 01,02,05
 ```
 
 ### Option B: Beginner example: load only Scenario 01 customer CSV files

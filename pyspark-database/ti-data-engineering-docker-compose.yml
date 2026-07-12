@@ -85,7 +85,7 @@ services:
     ports:
       - "8888:8888"
     volumes:
-      - C:/Code/docker/notebooks:/home/jovyan/work
+      - ../:/home/jovyan/work
     environment:
       SPARK_MASTER: spark://spark-master:7077
       JUPYTER_TOKEN: admin123
