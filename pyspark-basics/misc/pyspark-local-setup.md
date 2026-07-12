@@ -78,7 +78,81 @@ spark-master
 spark-worker
 ```
 
-## STEP 4: Open Jupyter Notebook
+## STEP 4: Create PostgreSQL training tables
+
+PostgreSQL is running now, but the lab tables are not created yet.
+
+Run this command to create the tables:
+
+```cmd
+docker exec -e PGPASSWORD=tiuser!23456 postgres psql -v ON_ERROR_STOP=1 -U ti_dbuser -d tinitiateai -f /lab/sql/01_schema.sql
+```
+
+Verify the training tables:
+
+```cmd
+docker exec -e PGPASSWORD=tiuser!23456 postgres psql -U ti_dbuser -d tinitiateai -c "\dt training.*"
+```
+
+You should see tables such as:
+
+```text
+training.customer
+training.sales
+training.emp
+training.sales_transaction
+training.load_audit
+```
+
+## STEP 5: Install DBeaver and connect to PostgreSQL
+
+DBeaver is a database tool. Students can use it to see PostgreSQL schemas, tables, and loaded data.
+
+Download DBeaver Community Edition for Windows:
+
+<https://dbeaver.io/download/>
+
+Install DBeaver, open it, and create a PostgreSQL connection.
+
+Use these connection details:
+
+```text
+Database type: PostgreSQL
+Host: localhost
+Port: 5432
+Database: tinitiateai
+Username: ti_dbuser
+Password: tiuser!23456
+```
+
+When DBeaver asks to download the PostgreSQL driver, click `Download`.
+
+After connecting, expand:
+
+```text
+tinitiateai
+  Schemas
+    training
+      Tables
+```
+
+## STEP 6: Install Python packages
+
+Install the Python packages used by the MinIO and PySpark labs:
+
+```cmd
+C:\Python311\python.exe -m pip install --user minio pyspark==3.5.3
+```
+
+If `python` already points to Python 3, this also works:
+
+```cmd
+python -m pip install --user minio pyspark==3.5.3
+```
+
+After installing PySpark, close and reopen Command Prompt if `spark-submit` is not recognized.
+
+## STEP 7: Open Jupyter Notebook
 
 Make sure the Jupyter container is running:
 
@@ -102,7 +176,7 @@ Copy that URL and paste it into your browser.
 
 If the URL asks for a token, use the token from the Docker logs.
 
-## STEP 5: Access local notebooks and files
+## STEP 8: Access local notebooks and files
 
 The Jupyter container opens inside the Docker environment.
 
@@ -117,7 +191,7 @@ pyspark-database
 pyspark-datalake
 ```
 
-## STEP 6: PostgreSQL access
+## STEP 9: PostgreSQL access
 
 PostgreSQL runs in Docker.
 
@@ -139,7 +213,7 @@ Example:
 docker exec -e PGPASSWORD=tiuser!23456 postgres psql -U ti_dbuser -d tinitiateai -c "\dt"
 ```
 
-## STEP 7: MinIO access
+## STEP 10: MinIO access
 
 Open MinIO in the browser:
 
@@ -160,7 +234,7 @@ The lab bucket is:
 datalake
 ```
 
-## STEP 8: PySpark to PostgreSQL lab
+## STEP 11: PySpark to PostgreSQL lab
 
 After Docker, PostgreSQL, MinIO, and Jupyter are running, continue here:
 
@@ -168,6 +242,6 @@ After Docker, PostgreSQL, MinIO, and Jupyter are running, continue here:
 
 That guide explains how to:
 
-1. create PostgreSQL tables;
-2. upload source files to MinIO;
-3. load CSV, JSON, or Parquet files from MinIO into PostgreSQL using PySpark.
+1. upload source files to MinIO;
+2. load CSV, JSON, or Parquet files from MinIO into PostgreSQL using PySpark;
+3. validate loaded data in PostgreSQL.

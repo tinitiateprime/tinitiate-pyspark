@@ -1,8 +1,14 @@
 # MinIO Source Files to PostgreSQL — Student Guide
 
-This document is a complete beginner guide for the MinIO to PostgreSQL PySpark lab.
+This document explains the MinIO to PostgreSQL PySpark lab.
 
-In this lab, students will download the lab files, start PostgreSQL and MinIO using Docker, create the PostgreSQL tables, upload the prepared files into MinIO, and then load the MinIO files into PostgreSQL using PySpark.
+Before starting this lab, complete the local setup:
+
+[`pyspark-basics/misc/pyspark-local-setup.md`](../pyspark-basics/misc/pyspark-local-setup.md)
+
+The local setup covers Docker, PostgreSQL, MinIO, DBeaver, Python packages, and PostgreSQL table creation.
+
+In this lab, students will upload the prepared files into MinIO and then load the MinIO files into PostgreSQL using PySpark.
 
 The goal is to practice a real data engineering flow:
 
@@ -12,13 +18,10 @@ CSV / JSON / Parquet files -> MinIO bucket -> PySpark -> PostgreSQL tables
 
 Simple lab flow:
 
-1. Download and extract the lab files into `C:\tinitiate_pyspark`.
-2. Start Docker containers for PostgreSQL and MinIO.
-3. Run the PostgreSQL DDL script to create tables.
-4. Connect to PostgreSQL using DBeaver and view the tables.
-5. Upload the prepared data files into MinIO.
-6. Run the PySpark load script to move data from MinIO into PostgreSQL.
-7. Check the loaded rows in PostgreSQL.
+1. Upload the prepared data files into MinIO.
+2. Check the files in the MinIO browser.
+3. Run the PySpark load script to move data from MinIO into PostgreSQL.
+4. Check the loaded rows in PostgreSQL or DBeaver.
 
 This lab uses:
 
@@ -26,14 +29,7 @@ This lab uses:
 - PostgreSQL user `ti_dbuser`
 - MinIO bucket `datalake`
 
-Before running commands, students must download and extract the project files.
-
-Students can get the project files in either of these ways:
-
-- go to the GitHub README and download the ZIP file: <https://github.com/tinitiateprime/data-appliance/blob/main/README.md>
-- follow the local download and extract guide: [`DOWNLOAD_AND_EXTRACT_PROJECT.md`](DOWNLOAD_AND_EXTRACT_PROJECT.md)
-
-After extracting the project, open Command Prompt and move into the project folder:
+Run all commands from the project folder:
 
 ```cmd
 cd C:\tinitiate_pyspark
@@ -49,183 +45,7 @@ If students want to generate the source files locally instead of using the GitHu
 
 [`GENERATE_FILES_LOCALLY.md`](GENERATE_FILES_LOCALLY.md)
 
-## Step 1: Install Docker Desktop
-
-Download Docker Desktop for Windows:
-
-<https://www.docker.com/products/docker-desktop/>
-
-Install it, start Docker Desktop, and wait until Docker says it is running.
-
-Check Docker:
-
-To check the Docker version, run:
-
-```cmd
-docker version
-```
-
-![Docker version command output](../docker_version.jpg)
-
-
-
-```cmd
-docker ps
-```
-
-![Docker container command output](../docker_container.jpg)
-
-`docker ps` shows running containers. If Docker is working but no containers are running yet, the list may be empty.
-
-## Step 2: Start the Docker stack
-
-Use this Docker compose file:
-
-[`pyspark-database/ti-data-engineering-docker-compose.yml`](ti-data-engineering-docker-compose.yml)
-
-Run:
-
-```cmd
-docker compose -f pyspark-database/ti-data-engineering-docker-compose.yml up -d
-```
-
-For this lab, students mainly need these two services:
-
-| Service | Container | URL or port |
-|---|---|---|
-| PostgreSQL | `postgres` | `localhost:5432` |
-| MinIO | `minio` | API: `localhost:9000`, browser: `http://localhost:9001` |
-
-The Docker compose file may start other support containers also. For this lab, focus on `postgres` and `minio`.
-
-Check containers:
-
-```cmd
-docker ps
-```
-
-![Docker container command output](../docker_container.jpg)
-
-For this lab, these two containers must be running:
-
-```text
-postgres
-minio
-```
-
-## Step 3: Create PostgreSQL tables
-
-PostgreSQL is running now, but the lab tables are not created yet.
-
-Run this command to create the tables inside PostgreSQL:
-
-```cmd
-docker exec -e PGPASSWORD=tiuser!23456 postgres psql -v ON_ERROR_STOP=1 -U ti_dbuser -d tinitiateai -f /lab/sql/01_schema.sql
-```
-
-This runs the DDL file [`pyspark-database/sql/01_schema.sql`](sql/01_schema.sql) inside the Docker PostgreSQL container.
-
-Verify the training tables:
-
-```cmd
-docker exec -e PGPASSWORD=tiuser!23456 postgres psql -U ti_dbuser -d tinitiateai -c "\dt training.*"
-```
-
-You should see tables such as:
-
-```text
-training.customer
-training.sales
-training.emp
-training.sales_transaction
-training.load_audit
-```
-
-PostgreSQL details:
-
-```text
-Host: localhost
-Port: 5432
-Database: tinitiateai
-User: ti_dbuser
-Password: tiuser!23456
-Schema: training
-```
-
-Note: `PGPASSWORD` is only used for this command. It passes the PostgreSQL password to Docker while the command runs.
-
-At this point, PostgreSQL has empty training tables. The data itself is loaded later from MinIO into PostgreSQL by PySpark.
-
-## Step 4: Install DBeaver and connect to PostgreSQL
-
-DBeaver is a database tool. Students can use it to see the PostgreSQL database, schemas, tables, and loaded data.
-
-Download DBeaver Community Edition for Windows:
-
-<https://dbeaver.io/download/>
-
-Install DBeaver, open it, and create a PostgreSQL connection.
-
-Use these connection details:
-
-```text
-Database type: PostgreSQL
-Host: localhost
-Port: 5432
-Database: tinitiateai
-Username: ti_dbuser
-Password: tiuser!23456
-```
-
-When DBeaver asks to download the PostgreSQL driver, click `Download`.
-
-After connecting, expand:
-
-```text
-tinitiateai
-  Schemas
-    training
-      Tables
-```
-
-Students should see tables such as:
-
-```text
-customer
-dept
-emp
-location
-product
-projects
-sales
-sales_transaction
-load_audit
-```
-
-At this point the tables may be empty. The data will appear after the PySpark load step.
-
-## Step 5: Install Python packages
-
-Install the Python packages used by this lab:
-
-- `minio`, to upload files into MinIO;
-- `pyspark`, to run the PySpark load script.
-
-Run:
-
-```cmd
-C:\Python311\python.exe -m pip install --user minio pyspark==3.5.3
-```
-
-If `python` already points to Python 3, this also works:
-
-```cmd
-python -m pip install --user minio pyspark==3.5.3
-```
-
-After installing PySpark, close and reopen Command Prompt if `spark-submit` is not recognized.
-
-## Step 6: Upload the GitHub files to MinIO
+## Step 1: Upload the GitHub files to MinIO
 
 If students downloaded and extracted the prepared files from GitHub, the files should already exist under:
 
@@ -264,7 +84,7 @@ If students want to generate the files locally instead of using the GitHub ZIP f
 
 [`GENERATE_FILES_LOCALLY.md`](GENERATE_FILES_LOCALLY.md)
 
-## Step 7: Check files in MinIO
+## Step 2: Check files in MinIO
 
 Open:
 
@@ -319,7 +139,7 @@ datalake
         customer
 ```
 
-## Step 8: Load data from MinIO to PostgreSQL using PySpark
+## Step 3: Load data from MinIO to PostgreSQL using PySpark
 
 In this step, PySpark reads files from MinIO and writes the rows into PostgreSQL.
 
