@@ -32,7 +32,7 @@ This lab uses:
 Run all commands from the project folder:
 
 ```cmd
-cd C:\tinitiate_pyspark
+cd C:\Code\tinitiate_pyspark
 ```
 
 This folder is called the repository root. All commands in this guide should be run from this location.

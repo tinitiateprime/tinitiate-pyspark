@@ -44,30 +44,31 @@ Download or clone this repository:
 Extract or clone the repository into:
 
 ```text
-C:\tinitiate_pyspark
+C:\Code\tinitiate_pyspark
 ```
 
 After extraction, the project folder should look like this:
 
 ```text
 C:\
-  tinitiate_pyspark
-    README.md
-    pyspark-basics
-    pyspark-database
-    pyspark-datalake
+  Code
+    tinitiate_pyspark
+      README.md
+      pyspark-basics
+      pyspark-database
+      pyspark-datalake
 ```
 
 Important: do not keep the files inside an extra nested folder like this:
 
 ```text
-C:\tinitiate_pyspark\tinitiate-pyspark
+C:\Code\tinitiate_pyspark\tinitiate-pyspark
 ```
 
 If that happens, move the inner files up one level so `README.md` and `pyspark-database` are directly inside:
 
 ```text
-C:\tinitiate_pyspark
+C:\Code\tinitiate_pyspark
 ```
 
 ### 2.2 Download the prepared data files
@@ -83,28 +84,29 @@ That ZIP is for data files. It may not contain markdown files such as `MINIO_TO_
 Extract or copy the prepared data into this folder inside the PySpark project:
 
 ```text
-C:\tinitiate_pyspark\data\database_scenarios
+C:\Code\tinitiate_pyspark\data\database_scenarios
 ```
 
 After extracting the data, the folder should look like this:
 
 ```text
 C:\
-  tinitiate_pyspark
-    data
-      database_scenarios
-        DDL
-          ddl.sql
-        01_many_small_json_customer
-        02_many_small_json_multiple_tables
-        03_many_large_json_sales
-        04_many_small_csv_emp
-        05_many_small_csv_multiple_tables
-        06_many_large_csv_emp
-        07_many_small_parquet_transaction
-        08_many_small_parquet_multiple_tables
-        09_many_large_parquet_sales
-        10_ultra_one_million_files
+  Code
+    tinitiate_pyspark
+      data
+        database_scenarios
+          DDL
+            ddl.sql
+          01_many_small_json_customer
+          02_many_small_json_multiple_tables
+          03_many_large_json_sales
+          04_many_small_csv_emp
+          05_many_small_csv_multiple_tables
+          06_many_large_csv_emp
+          07_many_small_parquet_transaction
+          08_many_small_parquet_multiple_tables
+          09_many_large_parquet_sales
+          10_ultra_one_million_files
 ```
 
 ### 2.3 Verify the folders
@@ -112,7 +114,7 @@ C:\
 Open Command Prompt and move into the project folder:
 
 ```cmd
-cd C:\tinitiate_pyspark
+cd C:\Code\tinitiate_pyspark
 ```
 
 Check the project folder:
@@ -174,7 +176,7 @@ The Docker setup mounts this project folder into the Jupyter container at:
 So this Windows project file:
 
 ```text
-C:\tinitiate_pyspark\pyspark-database\scripts\postgres.py
+C:\Code\tinitiate_pyspark\pyspark-database\scripts\postgres.py
 ```
 
 is available inside Docker as:
