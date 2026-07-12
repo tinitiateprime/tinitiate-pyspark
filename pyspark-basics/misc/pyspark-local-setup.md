@@ -117,12 +117,15 @@ Install DBeaver, open it, and create a PostgreSQL connection.
 
 
 ![alt text](image.png)
+
 click 1 ( database)
 
 ![alt text](image-1.png)
+
 click on New Database connection
 
 ![alt text](image-2.png)
+
 Click on PostgresSQL
 
 ![alt text](image-3.png)
