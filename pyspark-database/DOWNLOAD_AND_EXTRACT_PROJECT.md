@@ -13,6 +13,12 @@ Download or clone this repository:
 
 <https://github.com/tinitiateprime/tinitiate-pyspark>
 
+![alt text](image-3.png)
+
+Click on 1 to copy the link and paste it in the cmd .
+![alt text](image-4.png)
+This will clone the github repository to your local drive.
+
 Extract the repository into:
 
 ```text
