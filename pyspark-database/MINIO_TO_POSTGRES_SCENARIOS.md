@@ -45,9 +45,9 @@ The recommended approach is to download the prepared data ZIP files from GitHub 
 data/database_scenarios
 ```
 
-For the full download and extraction instructions, use:
+The download and extraction steps are covered in the local setup guide:
 
-[`DOWNLOAD_AND_EXTRACT_PROJECT.md`](DOWNLOAD_AND_EXTRACT_PROJECT.md)
+[`../pyspark-basics/misc/pyspark-local-setup.md`](../pyspark-basics/misc/pyspark-local-setup.md)
 
 If students want to generate the source files locally instead of using the GitHub files, use this optional guide:
 

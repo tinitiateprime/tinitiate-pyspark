@@ -10,8 +10,7 @@ Start here if you are new to this repository.
 
 | Topic | Link |
 |---|---|
-| Download and extract the lab files | [Download and extract project](pyspark-database/DOWNLOAD_AND_EXTRACT_PROJECT.md) |
-| Local PySpark setup | [PySpark local setup](pyspark-basics/misc/pyspark-local-setup.md) |
+| Local setup: download files, Docker, PostgreSQL, MinIO, DBeaver, PySpark | [PySpark local setup](pyspark-basics/misc/pyspark-local-setup.md) |
 | Supporting setup notes | [Misc setup notes](pyspark-basics/misc/README.md) |
 
 ## 2. PySpark Basics
