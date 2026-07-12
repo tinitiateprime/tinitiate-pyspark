@@ -151,52 +151,43 @@ datalake
 
 In this step, PySpark reads files from MinIO and writes the rows into PostgreSQL.
 
-Run these variables first in the same Command Prompt window:
+Students do not need to pass any parameters for the normal lab run.
+
+Run this command from the project folder:
 
 ```cmd
-set POSTGRES_JDBC_URL=jdbc:postgresql://localhost:5432/tinitiateai
-set POSTGRES_USER=ti_dbuser
-set POSTGRES_PASSWORD=tiuser!23456
-
-set MINIO_ENDPOINT=http://localhost:9000
-set MINIO_ACCESS_KEY=minio
-set MINIO_SECRET_KEY=minio123
-set MINIO_BUCKET=datalake
+C:\Python311\python.exe pyspark-database/scripts/postgres.py
 ```
 
-These values tell PySpark:
+Important: run the file from this project location:
 
-- where PostgreSQL is running;
-- which PostgreSQL user and password to use;
-- where MinIO is running.
+[`pyspark-database/scripts/postgres.py`](scripts/postgres.py)
+
+Do not run an old copied file from `Downloads`. If a student copied an older `postgres.py` into `Downloads`, it may fail because it cannot find the other project files.
 
 ### Python script used to load scenario folders
 
-The full reusable scripts are:
+The main student script is:
 
-- [`pyspark-database/scripts/load_files_to_postgres.py`](scripts/load_files_to_postgres.py), for loading one MinIO folder into one PostgreSQL table;
-- [`pyspark-database/scripts/load_minio_scenarios_to_postgres.py`](scripts/load_minio_scenarios_to_postgres.py), for loading multiple scenario folders.
+[`pyspark-database/scripts/postgres.py`](scripts/postgres.py)
 
-Use [`load_minio_scenarios_to_postgres.py`](scripts/load_minio_scenarios_to_postgres.py) when students want to load many scenario folders from MinIO into PostgreSQL.
+This script is simple for students because the default values are already inside the script:
 
-Students do not need to pass parameters for the normal lab run. By default, the script loads:
+- MinIO endpoint: `http://localhost:9000`
+- MinIO bucket: `datalake`
+- MinIO access key: `minio`
+- MinIO secret key: `minio123`
+- PostgreSQL database: `tinitiateai`
+- PostgreSQL user: `ti_dbuser`
+- PostgreSQL password: `tiuser!23456`
+- PostgreSQL schema: `training`
+- source format: `csv`
+- scenarios: `all`
 
-- source format: `csv`;
-- scenarios: `all`;
-- write mode: `overwrite`;
-- MinIO bucket: `datalake`;
-- PostgreSQL database: `tinitiateai`.
-
-The script also adds the required Spark packages automatically:
+The script also downloads the required Spark packages automatically the first time it runs:
 
 - PostgreSQL JDBC driver;
 - Hadoop AWS/S3A connector for MinIO.
-
-Do not run [`load_files_to_postgres.py`](scripts/load_files_to_postgres.py) by itself without arguments. It is a single-folder loader, so it must be given:
-
-- `--source-path`
-- `--source-format`
-- `--target-table`
 
 The basic scenario-loading logic is:
 
@@ -275,16 +266,14 @@ for scenario_no, scenario in SCENARIOS.items():
 spark.stop()
 ```
 
-The actual repository script has more features than the basic example above:
+The actual repository script uses this same idea, but supports all scenarios.
 
 - supports all scenarios 01-10;
 - loads CSV from all scenarios by default;
 - optionally accepts `--source-format json` or `--source-format parquet`;
 - optionally accepts selected scenarios like `--scenarios 01,02,05`;
-- uses table-specific column casting from [`load_files_to_postgres.py`](scripts/load_files_to_postgres.py);
-- writes rejected records and audit records.
 
-The commands to execute the full script are shown in Option A below.
+The commands are shown below.
 
 ### Option A: Load all MinIO scenario folders
 
@@ -293,7 +282,7 @@ Use this option when you want PySpark to load multiple scenario folders from Min
 For the normal lab run, students only run this command:
 
 ```cmd
-C:\Python311\python.exe pyspark-database/scripts/load_minio_scenarios_to_postgres.py
+C:\Python311\python.exe pyspark-database/scripts/postgres.py
 ```
 
 This loads all CSV scenario folders into PostgreSQL using the default settings.
@@ -301,13 +290,13 @@ This loads all CSV scenario folders into PostgreSQL using the default settings.
 If the instructor wants to load JSON instead of CSV:
 
 ```cmd
-C:\Python311\python.exe pyspark-database/scripts/load_minio_scenarios_to_postgres.py --source-format json
+C:\Python311\python.exe pyspark-database/scripts/postgres.py --source-format json
 ```
 
 If the instructor wants to load Parquet instead of CSV:
 
 ```cmd
-C:\Python311\python.exe pyspark-database/scripts/load_minio_scenarios_to_postgres.py --source-format parquet
+C:\Python311\python.exe pyspark-database/scripts/postgres.py --source-format parquet
 ```
 
 What this script does:
@@ -316,7 +305,6 @@ What this script does:
 2. Builds each MinIO path automatically.
 3. Reads the selected format: CSV, JSON, or Parquet.
 4. Loads each folder into the matching PostgreSQL table.
-5. Writes audit records into `training.load_audit`.
 
 Important: load one format at a time. CSV, JSON, and Parquet contain the same logical data. Loading all three formats together can duplicate data.
 
@@ -325,7 +313,7 @@ The default write mode is `overwrite`, which makes the lab easy to rerun. Some s
 If the instructor wants to load only selected scenarios, pass the scenario numbers:
 
 ```cmd
-C:\Python311\python.exe pyspark-database/scripts/load_minio_scenarios_to_postgres.py --scenarios 01,02,05
+C:\Python311\python.exe pyspark-database/scripts/postgres.py --scenarios 01,02,05
 ```
 
 ### Option B: Beginner example: load only Scenario 01 customer CSV files
