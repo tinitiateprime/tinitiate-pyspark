@@ -1,6 +1,10 @@
 # PySpark Basics
 
-Start with these notebooks before moving to database or performance labs.
+This section introduces PySpark using SQL-style learning topics.
+
+Students practice the most common query patterns first: selecting columns, filtering rows, grouping data, joining DataFrames, using operators, working with strings, and applying aggregate and analytical functions. These basics make the later PostgreSQL, MinIO, data lake, and performance labs easier to understand.
+
+Start here if the student is new to PySpark or wants to compare PySpark DataFrame logic with familiar SQL concepts.
 
 | Topic | Link |
 |---|---|

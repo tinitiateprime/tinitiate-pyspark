@@ -1,6 +1,10 @@
 # Data Lake
 
-MinIO-backed data lake examples and batch loading workflows.
+This section explains data lake style processing with PySpark and MinIO.
+
+Students learn how datasets can be organized in object storage, how batch loads can be performed, and why small files can become a performance issue. These lessons are useful after students understand the basic PySpark and PostgreSQL load flow.
+
+Use these topics to practice object-storage based data engineering patterns.
 
 | Topic | Link |
 |---|---|

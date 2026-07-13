@@ -1,6 +1,10 @@
 # Performance Tuning
 
-Use these after completing the PySpark basics and database labs.
+This section focuses on making PySpark jobs faster and more reliable.
+
+Students learn why file size, partitioning, joins, caching, and Spark configuration choices matter. The goal is to help students understand not only how to run a PySpark job, but also how to improve it when data volume grows.
+
+Complete the PySpark basics and the PostgreSQL/MinIO lab before starting these topics.
 
 | Topic | Link |
 |---|---|
