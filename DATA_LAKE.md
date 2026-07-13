@@ -2,14 +2,18 @@
 
 [Home](README.md) | [PySpark with PostgreSQL and MinIO](PYSPARK_POSTGRES_MINIO.md) | [Performance Tuning](PERFORMANCE_TUNING_INDEX.md)
 
-This section explains data lake style processing with PySpark and MinIO.
+This section explains data lake style processing with PySpark, MinIO, and Apache Iceberg.
 
-Students learn how datasets can be organized in object storage, how batch loads can be performed, and why small files can become a performance issue. These lessons are useful after students understand the basic PySpark and PostgreSQL load flow.
+Students first use the same source files that were created for the PostgreSQL lab. Those files are stored in the MinIO `datalake` bucket. Then PySpark reads the files and creates Iceberg tables in two layers:
 
-Use these topics to practice object-storage based data engineering patterns.
+- Bronze layer: raw data loaded from the source files.
+- Silver layer: cleaned data created from the Bronze layer.
+
+Use the Iceberg Bronze/Silver lab first. The older MinIO batch topics are also available for extra practice.
 
 | Topic | Link |
 |---|---|
+| Iceberg Bronze and Silver layers | [Iceberg Bronze/Silver lab](pyspark-datalake/ICEBERG_BRONZE_SILVER.md) |
 | Dataset design | [Dataset design](pyspark-datalake/01_dataset_design/README.md) |
 | MinIO setup | [MinIO setup](pyspark-datalake/02_minio_setup/README.md) |
 | Batch loads | [Batch loads](pyspark-datalake/03_batch_loads/README.md) |
