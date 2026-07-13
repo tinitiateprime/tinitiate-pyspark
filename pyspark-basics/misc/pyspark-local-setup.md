@@ -321,7 +321,7 @@ tinitiateai
 Install the Python packages used by the MinIO and PySpark labs:
 
 ```cmd
-C:\Python311\python.exe -m pip install --user minio pyspark==3.5.3
+python -m pip install --user minio pyspark==3.5.3
 ```
 
 If `python` already points to Python 3, this also works:

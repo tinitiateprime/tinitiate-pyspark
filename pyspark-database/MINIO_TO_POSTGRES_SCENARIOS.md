@@ -64,7 +64,7 @@ data/database_scenarios
 To upload those existing files to MinIO without generating them again, run:
 
 ```cmd
-C:\Python311\python.exe pyspark-database/scripts/publish_minio_lab.py --skip-generate
+python pyspark-database/scripts/publish_minio_lab.py --skip-generate
 ```
 
 Or:
@@ -335,7 +335,7 @@ This example loads the CSV version of Scenario 01 from MinIO into PostgreSQL tab
 Before starting this example, make sure students already ran:
 
 ```cmd
-C:\Python311\python.exe pyspark-database/scripts/publish_minio_lab.py --skip-generate
+python pyspark-database/scripts/publish_minio_lab.py --skip-generate
 ```
 
 JSON and Parquet work the same way; only the format folder and `--source-format` value change.
@@ -501,7 +501,7 @@ docker exec -e PGPASSWORD=tiuser!23456 ti-batch-postgres psql -U ti_dbuser -d ti
 Re-running [`publish_minio_lab.py`](scripts/publish_minio_lab.py) uploads the files again and replaces objects with the same names.
 
 ```cmd
-C:\Python311\python.exe pyspark-database/scripts/publish_minio_lab.py --skip-generate
+python pyspark-database/scripts/publish_minio_lab.py --skip-generate
 ```
 
 If old folders were created with different names, delete them from the MinIO console before republishing.
@@ -516,7 +516,7 @@ NoSuchBucket
 it means the `datalake` bucket is not in MinIO yet. Run the upload script again:
 
 ```cmd
-C:\Python311\python.exe pyspark-database/scripts/publish_minio_lab.py --skip-generate
+python pyspark-database/scripts/publish_minio_lab.py --skip-generate
 ```
 
 Then run the PySpark load command again.

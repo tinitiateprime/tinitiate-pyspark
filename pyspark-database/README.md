@@ -114,13 +114,13 @@ The Docker compose file mounts [`01_schema.sql`](sql/01_schema.sql) into the Pos
 ## 2. Prepare Python and JDBC
 
 ```cmd
-C:\Python311\python.exe -m pip install --user -r pyspark-database/requirements.txt
+python -m pip install --user -r pyspark-database/requirements.txt
 ```
 
 For MinIO publishing only, this smaller install is enough:
 
 ```cmd
-C:\Python311\python.exe -m pip install --user minio pyarrow
+python -m pip install --user minio pyarrow
 ```
 
 The examples use the PostgreSQL JDBC driver package:

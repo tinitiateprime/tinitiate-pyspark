@@ -13,21 +13,33 @@ Every scenario follows the same learning phases:
 
 Scenario 11 adds a separate atomic CDC phase and reconciliation phase.
 
-Each scenario directory also contains an independent `generate_source.py`. The complete generate → MinIO → PostgreSQL student exercise is in [MinIO source files to PostgreSQL](../MINIO_TO_POSTGRES_SCENARIOS.md).
+Each scenario directory contains an independent Python generator named `generate_source.py`. The complete generate → MinIO → PostgreSQL student exercise is in [MinIO source files to PostgreSQL](../MINIO_TO_POSTGRES_SCENARIOS.md).
 
-| # | Detailed lesson | Runnable script | Source → target |
+Use Python to generate a scenario locally:
+
+```cmd
+python pyspark-database/scenarios/01_many_small_json_customer/generate_source.py
+```
+
+Use the main PySpark loader to load files from MinIO into PostgreSQL:
+
+```cmd
+docker exec ti-batch-jupyter spark-submit --packages "org.postgresql:postgresql:42.7.4,org.apache.hadoop:hadoop-aws:3.3.4" /home/jovyan/work/pyspark-database/scripts/postgres.py
+```
+
+| # | Detailed lesson | Python generator | Source → target |
 | --- | --- | --- | --- |
-| 01 | [Many small JSON files to customer](01_many_small_json_customer/README.md) | [`run.ps1`](01_many_small_json_customer/run.ps1) | JSON → `customer` |
-| 02 | [Many small JSON files to multiple tables](02_many_small_json_multiple_tables/README.md) | [`run.ps1`](02_many_small_json_multiple_tables/run.ps1) | JSON → `location`, `product`, `customer`, `sales` |
-| 03 | [Many large JSON files to sales](03_many_large_json_sales/README.md) | [`run.ps1`](03_many_large_json_sales/run.ps1) | JSON → `sales` |
-| 04 | [Many small CSV files to employee](04_many_small_csv_emp/README.md) | [`run.ps1`](04_many_small_csv_emp/run.ps1) | CSV → `emp` |
-| 05 | [Many small CSV files to multiple tables](05_many_small_csv_multiple_tables/README.md) | [`run.ps1`](05_many_small_csv_multiple_tables/run.ps1) | CSV → `dept`, `projects`, `emp`, `emp_projects` |
-| 06 | [Many large CSV files to employee](06_many_large_csv_emp/README.md) | [`run.ps1`](06_many_large_csv_emp/run.ps1) | CSV → `emp` |
-| 07 | [Many small Parquet files to transactions](07_many_small_parquet_transaction/README.md) | [`run.ps1`](07_many_small_parquet_transaction/run.ps1) | Parquet → `sales_transaction` |
-| 08 | [Many small Parquet files to multiple tables](08_many_small_parquet_multiple_tables/README.md) | [`run.ps1`](08_many_small_parquet_multiple_tables/run.ps1) | Parquet → four tables |
-| 09 | [Many large Parquet files to sales](09_many_large_parquet_sales/README.md) | [`run.ps1`](09_many_large_parquet_sales/run.ps1) | Parquet → `sales` |
-| 10 | [Ultra volume up to one million files](10_ultra_one_million_files/README.md) | [`run.ps1`](10_ultra_one_million_files/run.ps1) | CSV/JSON/Parquet → `sales_transaction` |
-| 11 | [Millions of updates and deletes](11_millions_updates_deletes/README.md) | [`run.ps1`](11_millions_updates_deletes/run.ps1) | CDC files → staging → `sales_transaction` |
+| 01 | [Many small JSON files to customer](01_many_small_json_customer/README.md) | [`generate_source.py`](01_many_small_json_customer/generate_source.py) | JSON → `customer` |
+| 02 | [Many small JSON files to multiple tables](02_many_small_json_multiple_tables/README.md) | [`generate_source.py`](02_many_small_json_multiple_tables/generate_source.py) | JSON → `location`, `product`, `customer`, `sales` |
+| 03 | [Many large JSON files to sales](03_many_large_json_sales/README.md) | [`generate_source.py`](03_many_large_json_sales/generate_source.py) | JSON → `sales` |
+| 04 | [Many small CSV files to employee](04_many_small_csv_emp/README.md) | [`generate_source.py`](04_many_small_csv_emp/generate_source.py) | CSV → `emp` |
+| 05 | [Many small CSV files to multiple tables](05_many_small_csv_multiple_tables/README.md) | [`generate_source.py`](05_many_small_csv_multiple_tables/generate_source.py) | CSV → `dept`, `projects`, `emp`, `emp_projects` |
+| 06 | [Many large CSV files to employee](06_many_large_csv_emp/README.md) | [`generate_source.py`](06_many_large_csv_emp/generate_source.py) | CSV → `emp` |
+| 07 | [Many small Parquet files to transactions](07_many_small_parquet_transaction/README.md) | [`generate_source.py`](07_many_small_parquet_transaction/generate_source.py) | Parquet → `sales_transaction` |
+| 08 | [Many small Parquet files to multiple tables](08_many_small_parquet_multiple_tables/README.md) | [`generate_source.py`](08_many_small_parquet_multiple_tables/generate_source.py) | Parquet → four tables |
+| 09 | [Many large Parquet files to sales](09_many_large_parquet_sales/README.md) | [`generate_source.py`](09_many_large_parquet_sales/generate_source.py) | Parquet → `sales` |
+| 10 | [Ultra volume up to one million files](10_ultra_one_million_files/README.md) | [`generate_source.py`](10_ultra_one_million_files/generate_source.py) | CSV/JSON/Parquet → `sales_transaction` |
+| 11 | [Millions of updates and deletes](11_millions_updates_deletes/README.md) | [`generate_source.py`](11_millions_updates_deletes/generate_source.py) | CDC files → staging → `sales_transaction` |
 
 ## Before starting
 

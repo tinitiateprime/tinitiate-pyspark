@@ -45,7 +45,7 @@ The local generator needs:
 Run:
 
 ```cmd
-C:\Python311\python.exe -m pip install --user minio pyarrow
+python -m pip install --user minio pyarrow
 ```
 
 If `python` already points to Python 3, this also works:
@@ -59,7 +59,7 @@ python -m pip install --user minio pyarrow
 Run this from the project root:
 
 ```cmd
-C:\Python311\python.exe pyspark-database/scripts/publish_minio_lab.py
+python pyspark-database/scripts/publish_minio_lab.py
 ```
 
 Or:
@@ -75,7 +75,7 @@ Scenario 11 is heavier because it creates larger update/delete datasets.
 To include it, run:
 
 ```cmd
-C:\Python311\python.exe pyspark-database/scripts/publish_minio_lab.py --include-heavy
+python pyspark-database/scripts/publish_minio_lab.py --include-heavy
 ```
 
 ## Upload existing files without regenerating
@@ -89,7 +89,7 @@ data/database_scenarios
 students can upload the existing files to MinIO without generating them again:
 
 ```cmd
-C:\Python311\python.exe pyspark-database/scripts/publish_minio_lab.py --skip-generate
+python pyspark-database/scripts/publish_minio_lab.py --skip-generate
 ```
 
 Use this when the files were already downloaded from GitHub and only need to be uploaded into the local MinIO bucket.
