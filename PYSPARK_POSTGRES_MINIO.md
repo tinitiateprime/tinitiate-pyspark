@@ -1,5 +1,7 @@
 # PySpark with PostgreSQL and MinIO
 
+[Home](README.md) | [Setup](SETUP.md) | [PySpark Basics](PYSPARK_BASICS.md) | [Data Lake](DATA_LAKE.md)
+
 This section is the main database loading lab.
 
 Students work through a practical data engineering flow: source files are stored in MinIO, PySpark reads those files, and the data is loaded into PostgreSQL tables. The lab covers CSV, JSON, and Parquet files, and shows students how to validate the loaded data using PostgreSQL or DBeaver.

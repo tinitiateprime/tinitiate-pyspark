@@ -1,5 +1,7 @@
 # MinIO Source Files to PostgreSQL — Student Guide
 
+[Home](../README.md) | [Setup](../SETUP.md) | [PySpark with PostgreSQL and MinIO](../PYSPARK_POSTGRES_MINIO.md)
+
 This document explains the MinIO to PostgreSQL PySpark lab.
 
 Before starting this lab, complete the local setup:

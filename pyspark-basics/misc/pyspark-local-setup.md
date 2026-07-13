@@ -1,5 +1,7 @@
 # PySpark Local Setup
 
+[Home](../../README.md) | [Setup](../../SETUP.md) | [PySpark with PostgreSQL and MinIO](../../PYSPARK_POSTGRES_MINIO.md)
+
 Use this page to run PySpark locally with Docker.
 
 This setup uses the same Docker stack used in the PySpark to PostgreSQL lab.

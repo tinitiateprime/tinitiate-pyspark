@@ -1,5 +1,7 @@
 # PySpark Basics
 
+[Home](README.md) | [Setup](SETUP.md) | [PySpark with PostgreSQL and MinIO](PYSPARK_POSTGRES_MINIO.md)
+
 This section introduces PySpark using SQL-style learning topics.
 
 Students practice the most common query patterns first: selecting columns, filtering rows, grouping data, joining DataFrames, using operators, working with strings, and applying aggregate and analytical functions. These basics make the later PostgreSQL, MinIO, data lake, and performance labs easier to understand.

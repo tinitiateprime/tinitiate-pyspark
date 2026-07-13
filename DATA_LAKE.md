@@ -1,5 +1,7 @@
 # Data Lake
 
+[Home](README.md) | [PySpark with PostgreSQL and MinIO](PYSPARK_POSTGRES_MINIO.md) | [Performance Tuning](PERFORMANCE_TUNING_INDEX.md)
+
 This section explains data lake style processing with PySpark and MinIO.
 
 Students learn how datasets can be organized in object storage, how batch loads can be performed, and why small files can become a performance issue. These lessons are useful after students understand the basic PySpark and PostgreSQL load flow.

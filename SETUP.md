@@ -1,5 +1,7 @@
 # Setup
 
+[Home](README.md) | [PySpark Basics](PYSPARK_BASICS.md) | [PySpark with PostgreSQL and MinIO](PYSPARK_POSTGRES_MINIO.md)
+
 This section prepares the student machine for all PySpark labs in this repository.
 
 Students will install Docker Desktop, download the project files, start the required containers, and verify that PostgreSQL, MinIO, Spark, and Jupyter are running correctly. This step should be completed before opening the PySpark basics, database, data lake, or performance tuning lessons.
