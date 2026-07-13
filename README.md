@@ -1,26 +1,46 @@
-# Tinitiate PySpark
+![Tinitiate PySpark Image](tinitiate-pyspark.png)
 
-PySpark learning repository for students who want to practice Spark basics, data loading, PostgreSQL integration, MinIO object storage, and performance tuning.
+# PySpark Tutorial
+&copy; TINITIATE.COM
 
-Use this README as the main index. Detailed steps are kept in separate markdown files.
+## CONTENTS
 
-## Main Topics
+* ### [Setup](SETUP.md)
+    * Download and extract the project
+    * Install Docker Desktop
+    * Start PostgreSQL, MinIO, Spark, and Jupyter
+    * Install DBeaver
+    * Verify local setup
 
-| # | Topic | Link |
-|---|---|---|
-| 1 | Setup | [Open setup guide](SETUP.md) |
-| 2 | PySpark Basics | [Open PySpark basics](PYSPARK_BASICS.md) |
-| 3 | PySpark with PostgreSQL and MinIO | [Open PostgreSQL and MinIO guide](PYSPARK_POSTGRES_MINIO.md) |
-| 4 | Data Lake | [Open data lake guide](DATA_LAKE.md) |
-| 5 | Performance Tuning | [Open performance tuning guide](PERFORMANCE_TUNING_INDEX.md) |
+* ### [PySpark Basics](PYSPARK_BASICS.md)
+    * DQL clauses
+    * Joins
+    * Set operations
+    * Basic operators
+    * String functions
+    * Aggregate functions
+    * Analytical functions
 
-## Recommended Learning Order
+* ### [PySpark with PostgreSQL and MinIO](PYSPARK_POSTGRES_MINIO.md)
+    * Upload files to MinIO
+    * Load CSV files into PostgreSQL using PySpark
+    * Load JSON files into PostgreSQL using PySpark
+    * Load Parquet files into PostgreSQL using PySpark
+    * Validate loaded data in PostgreSQL
 
-1. Complete the PySpark basics notebooks.
-2. Run the PySpark with PostgreSQL and MinIO lab.
-3. Practice the data lake examples.
-4. Study performance tuning.
+* ### [Data Lake](DATA_LAKE.md)
+    * Dataset design
+    * MinIO setup
+    * Batch loads
+    * Small-file compaction
+    * Validation
 
----
+* ### [Performance Tuning](PERFORMANCE_TUNING_INDEX.md)
+    * File I/O performance
+    * Small file vs large file handling
+    * Spark performance tuning
+    * Join and partition tuning
 
-TINITIATE.COM
+***
+| &copy; TINITIATE.COM |
+|----------------------|
